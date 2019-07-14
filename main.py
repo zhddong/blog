@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
+
 #导入模板模块
 from flask import Flask
 import hashlib
