@@ -20,7 +20,7 @@ hash = hashlib.sha1()
 hash.update('laowang123'.encode('utf-8'))
 # 定义要执行的SQL语句
 sql = "INSERT INTO `user`( `name`,`passwd`, `email`) VALUES {};"
-op_sql = sql.format(("laowang", hash.hexdigest(),"12213555@qq.com"))
+op_sql = sql.format(("happy", hash.hexdigest(),"12213555@qq.com"))
 # 执行SQL语句
 cursor.execute(op_sql)
 conn.commit()

@@ -21,4 +21,13 @@ class Article(object):
  			
 		except Exception as e:
 			print(sql,e)
-		
+	def increase(self,user_id,title,class_id,content,label_id):
+			sql = "INSERT INTO `article`( `user_id`, `title`, `class_id`,`content`, `label_id`) VALUES {}"
+			op_sql = sql.format((user_id,title,class_id,content,label_id))
+			print(op_sql)
+
+			try:
+				self.cursor.execute(op_sql)
+ 		
+			except Exception as e:
+				print(op_sql,e)
