@@ -31,3 +31,51 @@ class Article(object):
  		
 			except Exception as e:
 				print(op_sql,e)
+	def data_display(self,fileds):
+		# %(id,"%",author,"%","%",title,"%",label)
+		sql = """SELECT a.id,user.name,a.title,a.label_id, 
+		a.content,a.create_time,  a.status,user.status,user.id 
+		FROM article as a,user WHERE user.status=0  and a.user_id=user.id and a.id=%s  and  a.label_id=%s"""
+		try:
+			self.cursor.execute(sql,fileds)
+			data = self.cursor.fetchall()
+			return data
+
+ 			
+		except Exception as e:
+			print(sql,e)
+	def data_name_display(self,name):
+		# %(id,"%",author,"%","%",title,"%",label)
+		sql = """SELECT a.id,user.name,a.title,a.label_id, 
+		a.content,a.create_time,  a.status,user.status,user.id 
+		FROM article as a,user WHERE user.status=0 and a.user_id=user.id user.name=name"""
+		try:
+			self.cursor.execute(sql)
+			data = self.cursor.fetchall()
+			return data
+
+ 			
+		except Exception as e:
+			print(sql,e)
+	def data_all_display(self):
+		# %(id,"%",author,"%","%",title,"%",label)
+		sql = """SELECT a.id,user.name,a.title,a.label_id, 
+		a.content,a.create_time,  a.status,user.status,user.id 
+		FROM article as a,user WHERE user.status=0  and a.user_id=user.id """
+		try:
+			self.cursor.execute(sql)
+			data = self.cursor.fetchall()
+			return data
+
+ 			
+		except Exception as e:
+			print(sql,e)
+
+if __name__ == '__main__':
+	a = Article()
+	# b = a.data_display(2,"o","结巴",1)
+	# print(b)
+	c = a.increase(2,"山东",2,"山东很巴适",2)
+	print(c)
+	import time
+	time.sleep(100) 
