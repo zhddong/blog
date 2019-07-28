@@ -16,15 +16,15 @@ class Article(object):
 		try:
 			self.cursor.execute(sql)
 			data = self.cursor.fetchall()
-			print("文章详细：",data)
+			# print("文章详细：",data)
 			return data
  			
 		except Exception as e:
 			print(sql,e)
-	def increase(self,user_id,title,class_id,content,label_id):
-			sql = "INSERT INTO `article`( `user_id`, `title`, `class_id`,`content`, `label_id`) VALUES {}"
-			op_sql = sql.format((user_id,title,class_id,content,label_id))
-			print(op_sql)
+	def increase(self,user_id,title,class_id,content,label_id,status):
+			sql = "INSERT INTO `article`( `user_id`, `title`, `class_id`,`content`, `label_id`, `status`) VALUES {}"
+			op_sql = sql.format((user_id,title,class_id,content,label_id,status))
+			# print(op_sql)
 
 			try:
 				self.cursor.execute(op_sql)

@@ -19,7 +19,7 @@ def hello_world():
 def transformation(label_id):
     if label_id == "星座":
         return 0
-    elif label_id == "新鲜事":
+    elif label_id == "历史":
         return 1
     elif label_id == "科技":
         return 2
@@ -43,13 +43,18 @@ def transformation_2(label_id):
     if label_id == 0:
         return "星座"
     elif label_id == 1:
-        return "新鲜事"
+        return "历史"
     elif label_id == 2:
         return "科技"
     elif label_id == 3:
         return "旅游"
     else:
         return "其他"
+def status_num(status):
+    if status == "on":
+        return 1
+    else:
+        return 0
 # 实现文章从数据库的取出
 @app.route('/content_list', methods=['POST', 'GET'])
 def content_list():
@@ -67,12 +72,12 @@ def content_list():
     # print(fileds,req_id,label_id)
     # req_label = int(req_label)
     blog_article = Article()
-    fileds = (req_id,req_label)
-    if req_id and req_label !=None:
+    # fileds = (req_id,req_label)
+    # if req_id and req_label !=None:
         
-        data = blog_article.data_display(fileds)
-    else:
-        data = blog_article.data_all_display()
+    #     data = blog_article.data_display(fileds)
+    # else:
+    data = blog_article.data_all_display()
     if not data:
         res = {"code": -1,
         "msg": "没有找到",
@@ -95,31 +100,46 @@ def content_list():
         content = i[4]#文章内容
         create_time = str(i[5])#创建时间
         status = i[6]#文章状态
-        
+
+        if  req_id and int(req_id) != id:
+            continue
+        if  req_author and req_author != name:
+            continue
+        if  req_title and req_title not in title:
+            continue
+        if  req_label and int(req_label) != label:
+            continue
+
         # if req_author in name and req_id=None and req_label=None:
             # data = blog_article.data_name_display(req_author)
         # if req_author not in name:
         #     continue
         # if req_title not in title:
         #     continue
-        # label_id = transformation_2(label)
-        if status == 0:
-            status_0 = 0
-        else:
-            status_0 = 1
+        label_id = transformation_2(label)
+        # if status == 0:
+        #     status_0 = 0
+        # else:
+        #     status_0 = 1
         articlecontent = {"id": id,
-        "label": label,
+        "label": label_id,
         "title": title,
         "author": name,
         "content": content,
         "uploadtime": create_time,
-        "status": status_0}
+        "status": status}
         a.append(articlecontent)
-        print(articlecontent)
-    res = {"code": 0,
-    "msg": "",
-    "count": len(data),
-    "data": a }
+        # print(articlecontent)
+    if not a:
+        res = {"code": -1,
+        "msg": "没有找到",
+        "count": 0,
+        "data": [] }
+    else:
+        res = {"code": 0,
+        "msg": "",
+        "count": len(data),
+        "data": a }
     res = json.dumps(res)
     response = make_response(res)
     response.headers["Access-Control-Allow-Origin"] = "*"
@@ -132,13 +152,19 @@ def content():
     content = request.form.get("content")
     label = request.form.get("label")
     classification = request.form.get("classification")
+    status = request.form.get("status")
+    status = status_num(status)
     user_id = int (user_id)
     blog_article = Article()
     label_id = transformation(label)
     class_id = transformation1(classification)
-    print(label_id)
-    blog_article.increase(user_id,title,class_id,content,label_id)
-    return "kkk"
+    # print(label_id)
+    blog_article.increase(user_id,title,class_id,content,label_id,status)
+    # return "kkk"
+    res = {"code": 0,
+        "msg": "",
+        "data": [] }
+    res = json.dumps(res)
     response = make_response(res)
     response.headers["Access-Control-Allow-Origin"] = "*"
     return response
