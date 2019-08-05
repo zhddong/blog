@@ -12,7 +12,7 @@ class Article(object):
     	charset="utf8")
 		self.cursor = self.conn.cursor()
 	def query(self,id):
-		sql = "SELECT `id`, `user_id`, `class_id`, `label_id`, `title`, `content`, `read`, `create_time` FROM `article` WHERE `status`=0 and id=%d" %id
+		sql = "SELECT `id`, `user_id`, `class_id`, `label_id`, `title`, `content`, `read`, `create_time` FROM `article` WHERE `status`=1 and id=%d" %id
 		try:
 			self.cursor.execute(sql)
 			data = self.cursor.fetchall()
@@ -57,6 +57,7 @@ class Article(object):
  			
 		except Exception as e:
 			print(sql,e)
+		
 	def data_all_display(self):
 		# %(id,"%",author,"%","%",title,"%",label)
 		sql = """SELECT a.id,user.name,a.title,a.label_id, 

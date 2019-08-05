@@ -29,7 +29,7 @@ foot = """
 """
 def article2html():
 	html = ""
-	data = model_article.query(8)
+	data = model_article.query(22)
 	for x in data:
 		id = x[0]
 		user_id = x[1]

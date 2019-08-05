@@ -144,6 +144,32 @@ def content_list():
     response = make_response(res)
     response.headers["Access-Control-Allow-Origin"] = "*"
     return response
+#实现文章的修改
+@app.route('/content_modify', methods=['POST', 'GET'])
+def content_modify():
+    title = request.form.get("title")
+    user_id = request.form.get("author")
+    content = request.form.get("content")
+    label = request.form.get("label")
+    classification = request.form.get("classification")
+    status = request.form.get("status")
+    status = status_num(status)
+    user_id = int (user_id)
+    a = request.form.get("Data_acquired")
+    print(a)
+    blog_article = Article()
+    label_id = transformation(label)
+    class_id = transformation1(classification)
+    # print(label_id)
+    blog_article.increase(user_id,title,class_id,content,label_id,status)
+    # return "kkk"
+    res = {"code": 0,
+        "msg": "",
+        "data": [] }
+    res = json.dumps(res)
+    response = make_response(res)
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    return response
 # 实现文章的添加
 @app.route('/content', methods=['POST', 'GET'])
 def content():
