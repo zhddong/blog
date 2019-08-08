@@ -24,40 +24,32 @@ class Article(object):
 	def increase(self,user_id,title,class_id,content,label_id,status):
 			sql = "INSERT INTO `article`( `user_id`, `title`, `class_id`,`content`, `label_id`, `status`) VALUES {}"
 			op_sql = sql.format((user_id,title,class_id,content,label_id,status))
-			# print(op_sql)
+			print(op_sql)
 
 			try:
 				self.cursor.execute(op_sql)
  		
 			except Exception as e:
 				print(op_sql,e)
-	def data_display(self,fileds):
-		# %(id,"%",author,"%","%",title,"%",label)
-		sql = """SELECT a.id,user.name,a.title,a.label_id, 
-		a.content,a.create_time,  a.status,user.status,user.id 
-		FROM article as a,user WHERE user.status=0  and a.user_id=user.id and a.id=%s  and  a.label_id=%s"""
-		try:
-			self.cursor.execute(sql,fileds)
-			data = self.cursor.fetchall()
-			return data
+	def modify(self,user_id,title,class_id,content,label_id,status,article_id):
+			sql = """UPDATE `article` SET `user_id`=%d,`title`="%s",`class_id`=%d,
+			`content`="%s",`label_id`=%d,`status`=%d
+			WHERE `id`=%s"""%(user_id,title,class_id,content,label_id,status,article_id)
+			# op_sql = sql.format((user_id,title,class_id,content,label_id,status,id))
+			# print(sql)
+			# print(user_id,title,class_id,content,label_id,status,article_id)#检测收到的数据
 
- 			
-		except Exception as e:
-			print(sql,e)
-	def data_name_display(self,name):
-		# %(id,"%",author,"%","%",title,"%",label)
-		sql = """SELECT a.id,user.name,a.title,a.label_id, 
-		a.content,a.create_time,  a.status,user.status,user.id 
-		FROM article as a,user WHERE user.status=0 and a.user_id=user.id user.name=name"""
-		try:
-			self.cursor.execute(sql)
-			data = self.cursor.fetchall()
-			return data
-
- 			
-		except Exception as e:
-			print(sql,e)
-		
+			try:
+				self.cursor.execute(sql)
+ 		
+			except Exception as e:
+				print(sql,e)
+	def delete(self,delete_id):
+			sql = "UPDATE `article` SET `status`=2 WHERE  id=%d"%delete_id
+			try:
+				self.cursor.execute(sql)
+			except Exception as e:
+				print(sql,e)
 	def data_all_display(self):
 		# %(id,"%",author,"%","%",title,"%",label)
 		sql = """SELECT a.id,user.name,a.title,a.label_id, 
@@ -71,7 +63,33 @@ class Article(object):
  			
 		except Exception as e:
 			print(sql,e)
+	# def data_display(self,fileds):
+	# 	# %(id,"%",author,"%","%",title,"%",label)
+	# 	sql = """SELECT a.id,user.name,a.title,a.label_id, 
+	# 	a.content,a.create_time,  a.status,user.status,user.id 
+	# 	FROM article as a,user WHERE user.status=0  and a.user_id=user.id and a.id=%s  and  a.label_id=%s"""
+	# 	try:
+	# 		self.cursor.execute(sql,fileds)
+	# 		data = self.cursor.fetchall()
+	# 		return data
 
+ 			
+	# 	except Exception as e:
+	# 		print(sql,e)
+	# def data_name_display(self,name):
+	# 	# %(id,"%",author,"%","%",title,"%",label)
+	# 	sql = """SELECT a.id,user.name,a.title,a.label_id, 
+	# 	a.content,a.create_time,  a.status,user.status,user.id 
+	# 	FROM article as a,user WHERE user.status=0 and a.user_id=user.id user.name=name"""
+	# 	try:
+	# 		self.cursor.execute(sql)
+	# 		data = self.cursor.fetchall()
+	# 		return data
+
+ 			
+	# 	except Exception as e:
+	# 		print(sql,e)
+		
 if __name__ == '__main__':
 	a = Article()
 	# b = a.data_display(2,"o","结巴",1)

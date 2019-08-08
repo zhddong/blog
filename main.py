@@ -9,6 +9,7 @@ from model.blog_user import User
 from model.blog_article import Article
 from flask import make_response
 import json
+import types
 app = Flask(__name__)#flask框架的用法
 
 @app.route('/blog')
@@ -144,6 +145,10 @@ def content_list():
     response = make_response(res)
     response.headers["Access-Control-Allow-Origin"] = "*"
     return response
+@app.route('/delete_articles', methods=['POST', 'GET'])
+def delete_articles():
+    delete_id = request.form.get("id")
+    blog_article.delete(delete_id)
 #实现文章的修改
 @app.route('/content_modify', methods=['POST', 'GET'])
 def content_modify():
@@ -154,14 +159,16 @@ def content_modify():
     classification = request.form.get("classification")
     status = request.form.get("status")
     status = status_num(status)
+    # print(user_id)
     user_id = int (user_id)
-    Data_acquired = request.form.get("data.id")
-    print(Data_acquired)
+    article_id = request.form.get("id")
+    # print(Data_acquired)
     blog_article = Article()
     label_id = transformation(label)
     class_id = transformation1(classification)
     # print(label_id)
-    blog_article.increase(user_id,title,class_id,content,label_id,status)
+    print(user_id,title,class_id,content,label_id,status,article_id)
+    blog_article.modify(user_id,title,class_id,content,label_id,status,article_id)
     # return "kkk"
     res = {"code": 0,
         "msg": "",
