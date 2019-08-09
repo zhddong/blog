@@ -148,7 +148,16 @@ def content_list():
 @app.route('/delete_articles', methods=['POST', 'GET'])
 def delete_articles():
     delete_id = request.form.get("id")
-    blog_article.delete(delete_id)
+    print(delete_id)
+    blog_article = Article()
+    blog_article.delete(delete_id)  
+    res = {"code": 0,
+        "msg": "",
+        "data": [] }
+    res = json.dumps(res)
+    response = make_response(res)
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    return response
 #实现文章的修改
 @app.route('/content_modify', methods=['POST', 'GET'])
 def content_modify():

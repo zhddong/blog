@@ -45,7 +45,7 @@ class Article(object):
 			except Exception as e:
 				print(sql,e)
 	def delete(self,delete_id):
-			sql = "UPDATE `article` SET `status`=2 WHERE  id=%d"%delete_id
+			sql = "UPDATE `article` SET `status`=2 WHERE  id=%s"%delete_id
 			try:
 				self.cursor.execute(sql)
 			except Exception as e:
