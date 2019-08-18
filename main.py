@@ -10,7 +10,8 @@ from model.blog_class import Class
 from flask import make_response
 import json
 import types
-app = Flask(__name__)#flask框架的用法
+from flask import render_template
+app = Flask(__name__,template_folder="./templates",static_folder="./res")#flask框架的用法
 @app.route('/blog')
 def hello_world():
     return article2html()
@@ -54,6 +55,71 @@ def status_num(status):
         return 1
     else:
         return 0
+#显示文字内容及评论
+@app.route('/details', methods=['GET'])
+def details():
+    ct_id = request.args.get("id")
+    blog_article = Article()
+    data = blog_article.ct_details(ct_id)
+    if not data:
+        res = "该文章不存在！！！"
+        response = make_response(res,404)
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        return response
+    return render_template('details.html',
+        ct_title=data[0][0],
+        ct_content=data[0][1],
+        ct_time=data[0][2],
+        ct_read=data[0][5],
+        ct_like=data[0][6])
+# 闲言文章显示
+@app.route('/xianyan_dispaly', methods=['POST', 'GET'])
+def xianyan_dispaly():
+    if request.method == "POST":
+        create_time = request.form.get("create_time")
+        title = request.form.get("title")
+        content = request.form.get("content")
+        page = request.form.get("page")
+    else:
+        create_time = request.args.get("create_time")
+        title = request.args.get("title")
+        content = request.args.get("content")
+    blog_article = Article()
+    data = blog_article.xianyan_display()
+    # print(data)
+    
+    n = list(data)
+    a = []
+    for i in n:
+        title = i[0]#标题
+        content= i[1]#文章内容
+        create_time = i[2]#创建时间
+        content_id = i[4]#文章ID
+        create_time = str(create_time)
+        articlecontent = {"create_time": create_time,
+        "title":title,"content":content[0:200],
+        "id":content_id
+        }
+        # print(articlecontent)
+        a.append(articlecontent)
+    page = int(page)
+    page = page-1
+    b = page*10
+    # print(b)
+    if not a:
+        res = {"code": -1,
+        "msg": "没有找到",
+        "count": 0,
+        "data": [] }
+    else:
+        res = {"code": 0,
+        "msg": "",
+        "count": len(data),
+        "data": a[b:b+10] }
+    res = json.dumps(res)
+    response = make_response(res)
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    return response
 # 分类管理（取出）
 @app.route('/classification', methods=['POST', 'GET'])
 def classification():
