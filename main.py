@@ -72,6 +72,36 @@ def details():
         ct_time=data[0][2],
         ct_read=data[0][5],
         ct_like=data[0][6])
+#点赞
+@app.route('/index', methods=['POST','GET'])
+def fabulous():
+    if request.method == "POST":
+        ct_id = request.form.get("id")
+        ip = request.remote_addr
+        print(ip)
+        print(ct_id)
+        # ct_like = request.args.get("like")
+        blog_article = Article()
+        hash = hashlib.sha1()
+        a = str(ct_id+ip)
+        hash.update(a.encode('utf-8'))
+        combination = hash.hexdigest()
+        data = blog_article.ip_address(ct_id,ip,combination)
+        blog_article.commit()
+        res = {"code": 0,
+            "msg": "",
+            "data": [] }
+        res = json.dumps(res)
+        response = make_response(res)
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        return response
+    else:
+        return render_template('html/index.html')
+#浏览
+@app.route('/browse', methods=['GET'])
+def browse():
+    blog_article = Article()
+    data = blog_article.browse(ct_id)
 # 闲言文章显示
 @app.route('/xianyan_dispaly', methods=['POST', 'GET'])
 def xianyan_dispaly():
@@ -105,8 +135,9 @@ def xianyan_dispaly():
     page = int(page)
     page = page-1
     b = page*10
-    # print(b)
-    if not a:
+    c = a[b:b+10]
+    # print(c)
+    if not c:
         res = {"code": -1,
         "msg": "没有找到",
         "count": 0,
@@ -115,7 +146,7 @@ def xianyan_dispaly():
         res = {"code": 0,
         "msg": "",
         "count": len(data),
-        "data": a[b:b+10] }
+        "data": c }
     res = json.dumps(res)
     response = make_response(res)
     response.headers["Access-Control-Allow-Origin"] = "*"

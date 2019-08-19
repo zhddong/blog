@@ -87,7 +87,7 @@ layui.define(['element', 'form','laypage','jquery','laytpl'],function(exports){
 
   $(function () {
     $(".like").on('click',function () {
-     
+      
       if(!($(this).hasClass("layblog-this"))){
         this.text = '已赞';
         $(this).addClass('layblog-this');

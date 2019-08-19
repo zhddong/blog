@@ -67,7 +67,7 @@ class Article(object):
         # %(id,"%",author,"%","%",title,"%",label)
         sql = """SELECT a.title,
         a.content,a.create_time,user.id ,a.id 
-        FROM article as a,user WHERE user.status=0  and a.user_id=user.id  order by a.create_time desc"""
+        FROM article as a,user WHERE user.status=0  and a.user_id=user.id and a.status=1 order by a.create_time desc"""
         try:
             self.cursor.execute(sql)
             data = self.cursor.fetchall()
@@ -88,6 +88,40 @@ class Article(object):
                 
         except Exception as e:
             print(sql,e)
+    def fabulous(self,ct_id):
+        sql = "UPDATE `article` SET `like`=`like`+1 WHERE  id=%s"
+        try:
+            self.cursor.execute(sql,(ct_id))
+            data = self.cursor.fetchall()
+            return data
+
+                
+        except Exception as e:
+            print(sql,e)
+    def browse(self,ct_id):
+        sql = "UPDATE `article` SET `read`=`read`+1 WHERE  id=%s"
+        try:
+            self.cursor.execute(sql,(ct_id))
+            data = self.cursor.fetchall()
+            return data
+
+                
+        except Exception as e:
+            print(sql,e)
+    def ip_address(self,ct_id,ip,combination):
+        sql = """INSERT INTO `content_info`(`ct_id`, `ip_address`,`md5`)
+         VALUES (%s,%s,%s)"""
+        try:
+            self.cursor.execute(sql,(ct_id,ip,combination))
+            data = self.cursor.fetchall()
+            return data
+
+                
+        except Exception as e:
+            print(sql,e)
+
+    def commit(self):
+        self.conn.commit()
     # def data_display(self,fileds):
     #   # %(id,"%",author,"%","%",title,"%",label)
     #   sql = """SELECT a.id,user.name,a.title,a.label_id, 
