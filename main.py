@@ -6,6 +6,8 @@ from flask import request
 from control.markdown2html import article2html
 from model.blog_user import User
 from model.blog_article import Article
+from model.blog_content_info import Content_info
+from model.blog_comment import Comment
 from model.blog_class import Class
 from flask import make_response
 import json
@@ -55,8 +57,8 @@ def status_num(status):
         return 1
     else:
         return 0
-#显示文字内容及评论
-@app.route('/details', methods=['GET'])
+#显示文章内容
+@app.route('/details', methods=['POST','GET'])
 def details():
     ct_id = request.args.get("id")
     blog_article = Article()
@@ -71,26 +73,69 @@ def details():
         ct_content=data[0][1],
         ct_time=data[0][2],
         ct_read=data[0][5],
-        ct_like=data[0][6])
+        ct_like=data[0][6],
+        ct_id=23
+        )
+
+#评论
+@app.route('/comment', methods=['POST','GET'])
+def comment():
+    if request.method == "POST":
+        pass
+    else:
+        return render_template('html/comment.html',
+            d_avatar=56,
+            d_username="先后筽法",
+            d_praise=55,
+            d_content="公司客户"
+            )
 #点赞
 @app.route('/index', methods=['POST','GET'])
 def fabulous():
     if request.method == "POST":
         ct_id = request.form.get("id")
         ip = request.remote_addr
-        print(ip)
-        print(ct_id)
+        # print(ip)
+        # print(ct_id)
         # ct_like = request.args.get("like")
-        blog_article = Article()
+        blog_content_info = Content_info()
         hash = hashlib.sha1()
         a = str(ct_id+ip)
         hash.update(a.encode('utf-8'))
         combination = hash.hexdigest()
-        data = blog_article.ip_address(ct_id,ip,combination)
-        blog_article.commit()
+        data = blog_content_info.ip_address(ct_id,ip,combination)
+        print(data)
+        state = {"state": data}
+        print(state)
+        blog_content_info   .commit()
         res = {"code": 0,
             "msg": "",
-            "data": [] }
+            "data": state }
+        print(res)
+        res = json.dumps(res)
+        response = make_response(res)
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        return response
+    else:
+        return render_template('html/index.html')
+#点赞查询
+@app.route('/fabulous_query', methods=['POST','GET'])
+def fabulous_query():
+    if request.method == "POST":
+        ct_id = request.form.get("id")
+        # print(ip)
+        # print(ct_id)
+        # ct_like = request.args.get("like")
+        blog_content_info = Content_info()
+        data = blog_content_info.fabulous_query(ct_id)
+        print(data)
+        state = {"state": data}
+        print(state)
+        blog_content_info.commit()
+        res = {"code": 0,
+            "msg": "",
+            "data": state }
+        print(res)
         res = json.dumps(res)
         response = make_response(res)
         response.headers["Access-Control-Allow-Origin"] = "*"
@@ -117,7 +162,7 @@ def xianyan_dispaly():
     blog_article = Article()
     data = blog_article.xianyan_display()
     # print(data)
-    
+    blog_content_info = Content_info()
     n = list(data)
     a = []
     for i in n:
@@ -125,10 +170,15 @@ def xianyan_dispaly():
         content= i[1]#文章内容
         create_time = i[2]#创建时间
         content_id = i[4]#文章ID
+        is_like = blog_content_info.fabulous_query(content_id)
+        if not is_like:
+            is_like = 0
+        else:
+            is_like = 1
         create_time = str(create_time)
         articlecontent = {"create_time": create_time,
         "title":title,"content":content[0:200],
-        "id":content_id
+        "id":content_id ,"is_like":is_like
         }
         # print(articlecontent)
         a.append(articlecontent)

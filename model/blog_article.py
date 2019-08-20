@@ -108,18 +108,18 @@ class Article(object):
                 
         except Exception as e:
             print(sql,e)
-    def ip_address(self,ct_id,ip,combination):
-        sql = """INSERT INTO `content_info`(`ct_id`, `ip_address`,`md5`)
-         VALUES (%s,%s,%s)"""
-        try:
-            self.cursor.execute(sql,(ct_id,ip,combination))
-            data = self.cursor.fetchall()
-            return data
+    # def ip_address(self,ct_id,ip,combination):
+    #     sql = """INSERT INTO `content_info`(`ct_id`, `ip_address`,`md5`)
+    #      VALUES (%s,%s,%s)"""
+    #     try:
+    #         self.cursor.execute(sql,(ct_id,ip,combination))
+    #         data = self.cursor.fetchall()
+    #         return data
 
                 
-        except Exception as e:
-            print(sql,e)
-
+    #     except Exception as e:
+    #         print(sql,e,)
+    #         return 1
     def commit(self):
         self.conn.commit()
     # def data_display(self,fileds):

@@ -11,7 +11,7 @@
 		<div class="header">
 			<div class="header-wrap">
 				<h1 class="logo pull-left">
-					<a href="index.html">
+					<a href="index">
 						<img src="../res/static/images/logo.png" alt="" class="logo-img">
 						<img src="../res/static/images/logo-text.png" alt="" class="logo-text">
 					</a>
@@ -94,6 +94,7 @@
 		　　　　　　 }
 		})();
 		button_onclick()
+		// fabulous_query()
 	// 	function fabulous(item_id){
 	// 	// $(function () {
 	//  //    	$(".like").on('click',function () {
@@ -123,18 +124,44 @@
 	// }
 	   //  	});
   		// });
+  // 		function fabulous_query(item_id){
+		// $.ajax({ 
+  //       url: "fabulous_query"//layui.setter.base + 'json/user/reg.js' //实际使用请改成服务端真实接口
+  //       ,type:"POST"
+  //       ,data: {id:item_id}
+  //       ,dataType:"json",
+  //       success: function (data) {
+  //       	console.log(item_id)
+  //       	if(data.data.state!=1){
+  //       		document.getElementById("color"+item_id).style="color:#FF0000";
+  // 			}
+  // 		}
+  // 		})
+		// }
   		function fabulous(item_id){
 		// console.log("dadafw")
 		$.ajax({ 
         url: "index"//layui.setter.base + 'json/user/reg.js' //实际使用请改成服务端真实接口
         ,type:"POST"
         ,data: {id:item_id}
-        ,
+        ,dataType:"json",
+        success: function (data) {
+        	console.log(data.data.state)
+        	if(data.data.state!=1){
+        		document.getElementById("color"+item_id).style="color:#FF0000";
+			layer.msg('点赞成功', {
+	          icon: 6
+	          ,time: 1000
+	    	})
+	   		}
+			else {
+			layer.msg('已经点过赞了', {
+	          icon: 6
+	          ,time: 1000
+	    	})
+        	}
+        }
         });
-		layer.msg('点赞成功', {
-          icon: 6
-          ,time: 1000
-    	})
 		}
 		function button_onclick(){
 		$.ajax({
@@ -155,7 +182,7 @@
 									"</div>"+
 									"<div class='comment count'>"+
 										"<a href='http://127.0.0.1:8080/details?id="+item.id+"#comment'>评论</a>"+
-										"<a href='javascript:;' onclick='javascript:fabulous("+item.id+")'>点赞</a>"+
+										"<a href='javascript:;' id='color"+item.id+"' onclick='javascript:fabulous("+item.id+")'>点赞</a>"+
 									"</div>"+
 								"</div>";
 
@@ -163,6 +190,12 @@
 			// $('.container-wrap .contar-wrap').empty () ;
 			// $('.container-wrap .contar-wrap').replaceWith(html,function(index) {}) ;
 			document.getElementById("content_id").innerHTML=html ;
+			$.each(data.data,function(index, like){
+				console.log(like.is_like)
+				if (like.is_like==1){
+					document.getElementById("color"+like.id).style="color:#FF0000";
+				}
+			})
 			// $('.container-wrap .contar-wrap').after (html) ;
         }
 		})

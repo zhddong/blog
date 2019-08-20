@@ -49,6 +49,8 @@
 		<div class="container-wrap">
 			<div class="container container-message container-details container-comment">
 					<div class="contar-wrap">
+						<div id="comment">
+						</div>
 						<div class="item">
 							<div class="item-box  layer-photos-demo1 layer-photos-demo">
 								<h3>拥有诗意的心态,才能拥有诗意的生活</h3>
@@ -90,21 +92,58 @@
 		layui.config({
 		  base: '../res/static/js/' 
 		}).use('blog');
+		// function button_onclick(){
+		// $.ajax({
+  //       url: "http://127.0.0.1:8080/xianyan_dispaly",
+  //       type: "POST",
+  //       data: {page:Singleton.getInstance().getIndex()},
+  //       dataType: "json",
+  //       success: function (data) {
+		// 	var html='';
+		// 	$.each(data.data,function(index, item){
+		// 		// console.log("fkjhk",item);
+		// 		html+="<div class='item'>"+
+		// 			"<div class='item-box  layer-photos-demo1 layer-photos-demo'>"+
+		// 								"<h3><a href='http://127.0.0.1:8080/details?id="+item.id+"'>"+item.title+"</a></h3>"+
+		// 								"<h5>发布于：<span>"+item.create_time+"</span></h5>"+
+		// 								"<p>"+item.content+"</p>"+
+		// 								// "<img src='../res/static/images/item.png' alt=''>"+
+		// 							"</div>"+
+		// 							"<div class='comment count'>"+
+		// 								"<a href='http://127.0.0.1:8080/details?id="+item.id+"#comment'>评论</a>"+
+		// 								"<a href='javascript:;' id='color"+item.id+"' onclick='javascript:fabulous("+item.id+")'>点赞</a>"+
+		// 							"</div>"+
+		// 						"</div>";
+
+		// 	});
+		// 	// $('.container-wrap .contar-wrap').empty () ;
+		// 	// $('.container-wrap .contar-wrap').replaceWith(html,function(index) {}) ;
+		// 	document.getElementById("content_id").innerHTML=html ;
+		// 	$.each(data.data,function(index, like){
+		// 		console.log(like.is_like)
+		// 		if (like.is_like==1){
+		// 			document.getElementById("color"+like.id).style="color:#FF0000";
+		// 		}
+		// 	})
+		// 	// $('.container-wrap .contar-wrap').after (html) ;
+  //       }
+		// })
+		// }
 	</script>
 	<script id="LAY-msg-tpl" type="text/html">
 		<div class="info-box">
 			<div class="info-item">
-				<img class="info-img" src="{{ d.avatar }}" alt="">
+				<img class="info-img" src="{{ d_avatar }}" alt="">
 			  <div class="info-text">
 					<p class="title">
-					  <span class="name">{{ d.username }}</span>
+					  <span class="name">{{ d_username }}</span>
 					  <span class="info-img">
 					  	<i class="layui-icon layui-icon-praise"></i>
-					  	{{ d.praise }}
+					  	{{ d_praise }}
 					 	</span>
 					</p>
 					<p class="info-intr">
-						{{ d.content }}
+						{{ d_content }}
 					</p>
 			  </div>
 			</div>
