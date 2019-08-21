@@ -57,37 +57,148 @@ def status_num(status):
         return 1
     else:
         return 0
-#显示文章内容
+#显示文章内容以及评论内容
 @app.route('/details', methods=['POST','GET'])
 def details():
-    ct_id = request.args.get("id")
-    blog_article = Article()
-    data = blog_article.ct_details(ct_id)
-    if not data:
-        res = "该文章不存在！！！"
-        response = make_response(res,404)
+    if request.method == "POST":
+        ct_id = request.form.get("id")
+        page = request.form.get("page")
+        blog_comment = Comment()
+        comment = blog_comment.comments_query(ct_id)
+        print(ct_id)
+        if not comment:
+            res = {"code": -1,
+            "msg": "还没有评论",
+            "count": 0,
+            "data": [] }
+            res = json.dumps(res)
+            response = make_response(res)
+            return response
+        n = list(comment)
+        a = []
+        for i in n:
+            name = i[0]#用户名
+            like= i[1]#点赞量
+            content = i[2]#评论内容
+            articlecontent = {"name": name,
+            "like":like,"content":content[0:200]
+            }
+            # print(articlecontent)
+            a.append(articlecontent)
+        page = int(page)
+        page = page-1
+        b = page*3
+        c = a[b:b+3]
+        # print(c)
+        if not c:
+            res = {"code": -1,
+            "msg": "没有评论",
+            "count": 0,
+            "data": [] }
+        else:
+            res = {"code": 0,
+            "msg": "",
+            "count": 0,
+            "data": c }
+        res = json.dumps(res)
+        response = make_response(res)
         response.headers["Access-Control-Allow-Origin"] = "*"
         return response
-    return render_template('details.html',
-        ct_title=data[0][0],
-        ct_content=data[0][1],
-        ct_time=data[0][2],
-        ct_read=data[0][5],
-        ct_like=data[0][6],
-        ct_id=23
-        )
+    else:
+        ct_id = request.args.get("id")
+        blog_article = Article()
+        data = blog_article.ct_details(ct_id)
+        blog_comment = Comment()
+        comment = blog_comment.comments_query(ct_id)
+        # print(comment)
+        if not data:
+            res = "该文章不存在！！！"
+            response = make_response(res,404)
+            response.headers["Access-Control-Allow-Origin"] = "*"
+            return response
+        return render_template('details.html',
+            ct_title=data[0][0],
+            ct_content=data[0][1],
+            ct_time=data[0][2],
+            ct_read=data[0][5],
+            ct_like=data[0][6],
+            ct_id=ct_id
+            # user_name="happy",
+            # comment_like=560,
+            # comment_content="这篇文章写得好！！！"
+            )
 
-#评论
+#留言
+@app.route('/message', methods=['POST','GET'])
+def message():
+    if request.method == "POST":
+        pass
+    else:
+        return render_template('html/message.html',
+            )
+#关于
+@app.route('/about', methods=['POST','GET'])
+def about():
+    if request.method == "POST":
+        pass
+    else:
+        return render_template('html/about.html',
+            )
+#评论显示
 @app.route('/comment', methods=['POST','GET'])
 def comment():
     if request.method == "POST":
         pass
     else:
+        ct_id = request.args.get("id")
+        blog_article = Article()
+        data = blog_article.ct_details(ct_id)
+        # blog_comment = Comment()
+        # comment = blog_comment.comments_query(ct_id)
+        print(data)
         return render_template('html/comment.html',
-            d_avatar=56,
-            d_username="先后筽法",
-            d_praise=55,
-            d_content="公司客户"
+            comment_like=data[0][6],
+            comment_time=data[0][2],
+            comment_content=data[0][1],
+            comment_see=data[0][5],
+            comment_title=data[0][0],
+            ct_id=ct_id
+            )
+#评论添加
+@app.route('/comment_add', methods=['POST','GET'])
+def comment_add():
+    if request.method == "POST":
+        ct_id = request.form.get("id")
+        content = request.form.get("content")
+        ct_id = int (ct_id)
+        # print(ct_id)
+        ip = request.remote_addr
+        # print(ip)
+        blog_comment = Comment()
+        # hash = hashlib.sha1()
+        # hash.update(ip.encode('utf-8'))
+        # comment_ip = hash.hexdigest()
+        # print(ip)
+        blog_comment.comments_add(ct_id,ip,content)
+        blog_comment.commit()
+        res = {"code": 0,
+            "msg": "",
+            "data": [] }
+        res = json.dumps(res)
+        response = make_response(res)
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        return response
+    else:
+        # ct_id = request.args.get("id")
+        # blog_comment = Comment()
+        # comment = blog_article.comments_query(ct_id)
+        return render_template('html/comment.html',
+            comment_like=566,
+            comment_time="一天前",
+            comment_content="很好",
+            comment_see=545,
+            comment_title="公司客户",
+            ct_id=99
             )
 #点赞
 @app.route('/index', methods=['POST','GET'])

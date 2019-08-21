@@ -26,9 +26,9 @@
 				</form>
 				<div class="blog-nav pull-right">
 					<ul class="layui-nav pull-left">
-					  <li class="layui-nav-item layui-this"><a href="index.html">首页</a></li>
-					  <li class="layui-nav-item"><a href="message.html">留言</a></li>
-					  <li class="layui-nav-item"><a href="about.html">关于</a></li>
+					  <li class="layui-nav-item layui-this"><a href="index">首页</a></li>
+					  <li class="layui-nav-item"><a href="message">留言</a></li>
+					  <li class="layui-nav-item"><a href="about">关于</a></li>
 					</ul>
 					<a href="#" class="personal pull-left">
 						<i class="layui-icon layui-icon-username"></i>
@@ -41,9 +41,9 @@
 				</div>
 			</div>
 			<ul class="pop-nav" id="pop-nav">
-				<li><a href="index.html">首页</a></li>
-				<li><a href="message.html">留言</a></li>
-				<li><a href="about.html">关于</a></li>
+				<li><a href="index">首页</a></li>
+				<li><a href="message">留言</a></li>
+				<li><a href="about">关于</a></li>
 			</ul>
 		</div>
 		<div class="container-wrap">
@@ -191,7 +191,7 @@
 			// $('.container-wrap .contar-wrap').replaceWith(html,function(index) {}) ;
 			document.getElementById("content_id").innerHTML=html ;
 			$.each(data.data,function(index, like){
-				console.log(like.is_like)
+				// console.log(like.is_like)
 				if (like.is_like==1){
 					document.getElementById("color"+like.id).style="color:#FF0000";
 				}

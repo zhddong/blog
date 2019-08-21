@@ -11,7 +11,7 @@
 		<div class="header">
 			<div class="header-wrap">
 				<h1 class="logo pull-left">
-					<a href="index.html">
+					<a href="index">
 						<img src="../res/static/images/logo.png" alt="" class="logo-img">
 						<img src="../res/static/images/logo-text.png" alt="" class="logo-text">
 					</a>
@@ -53,23 +53,26 @@
 						</div>
 						<div class="item">
 							<div class="item-box  layer-photos-demo1 layer-photos-demo">
-								<h3>拥有诗意的心态,才能拥有诗意的生活</h3>
-								<h5>发布于：<span>刚刚</span></h5>
-								<p>父爱如山，不善表达。回想十多年前，总记得父亲有个宽厚的肩膀，小小的自己跨坐在上面，越过人山人海去看更广阔的天空，那个时候期望自己有一双翅膀，能够像鸟儿一样飞得高，看得远。虽然父亲有时会和自己开玩笑，但在做错事的时候会受到严厉的训斥。父亲有双粗糙的大手掌，手把手教我走路、骑车，却会在该放手的时刻果断地放开让自己去大胆尝试，那个时候期望快快长大，能够做自己想做的事，不用受父亲的“控制”。父亲是智慧树，他无所不知、无所不晓，虽然你有十万个为什么，但是也难不倒他。</p>
+								<h3>{{comment_title}}</h3>
+								<h5>发布于：<span>{{comment_time}}</span></h5>
+								<p>{{comment_content}}</p>
 								<img src="../res/static/images/item.png" 
 								 alt="帅哥">
 								<div class="count layui-clear">
-									<span class="pull-left">阅读 <em>100000+</em></span>
-									<span class="pull-right like"><i class="layui-icon layui-icon-praise"></i><em>999</em></span>
+									<span class="pull-left">阅读 <em>{{comment_see}}+</em></span>
+									<span class="pull-right like"><i class="layui-icon layui-icon-praise"></i><em>{{comment_like}}</em></span>
 								</div>
 							</div>
 						</div>	
 						<form class="layui-form" action="">
 							<div class="layui-form-item layui-form-text">
-								<textarea  class="layui-textarea"  style="resize:none" placeholder="写点什么啊"></textarea>
+								<textarea  class="layui-textarea" id="myText" style="resize:none" placeholder="写点什么啊"></textarea>
 							</div>
 							<div class="btnbox">
-									<a href="details.html"  id="sure">
+									<!-- <a  href="details" id="sure" onclick="comment(this)">
+							  		确定
+							  	</a> -->
+							  	<a  id="sure" onclick="comment(this)">
 							  		确定
 							  	</a>
 							</div>
@@ -86,51 +89,42 @@
 			<p><span>人生就是一场修行</span></p>
 		</div>
 	<script src="../res/layui/layui.js">
-
 	</script>
+	<script src="../res/static/js/jquery-1.9.0.min.js"></script>
 	<script>
 		layui.config({
 		  base: '../res/static/js/' 
 		}).use('blog');
-		// function button_onclick(){
-		// $.ajax({
-  //       url: "http://127.0.0.1:8080/xianyan_dispaly",
-  //       type: "POST",
-  //       data: {page:Singleton.getInstance().getIndex()},
-  //       dataType: "json",
-  //       success: function (data) {
-		// 	var html='';
-		// 	$.each(data.data,function(index, item){
-		// 		// console.log("fkjhk",item);
-		// 		html+="<div class='item'>"+
-		// 			"<div class='item-box  layer-photos-demo1 layer-photos-demo'>"+
-		// 								"<h3><a href='http://127.0.0.1:8080/details?id="+item.id+"'>"+item.title+"</a></h3>"+
-		// 								"<h5>发布于：<span>"+item.create_time+"</span></h5>"+
-		// 								"<p>"+item.content+"</p>"+
-		// 								// "<img src='../res/static/images/item.png' alt=''>"+
-		// 							"</div>"+
-		// 							"<div class='comment count'>"+
-		// 								"<a href='http://127.0.0.1:8080/details?id="+item.id+"#comment'>评论</a>"+
-		// 								"<a href='javascript:;' id='color"+item.id+"' onclick='javascript:fabulous("+item.id+")'>点赞</a>"+
-		// 							"</div>"+
-		// 						"</div>";
-
-		// 	});
-		// 	// $('.container-wrap .contar-wrap').empty () ;
-		// 	// $('.container-wrap .contar-wrap').replaceWith(html,function(index) {}) ;
-		// 	document.getElementById("content_id").innerHTML=html ;
-		// 	$.each(data.data,function(index, like){
-		// 		console.log(like.is_like)
-		// 		if (like.is_like==1){
-		// 			document.getElementById("color"+like.id).style="color:#FF0000";
-		// 		}
-		// 	})
-		// 	// $('.container-wrap .contar-wrap').after (html) ;
-  //       }
-		// })
-		// }
+		function comment(dom){
+			// var text=$(dom).siblings("input[type='text']").val();//获取它的值
+			var x = document.getElementById("myText").value;
+			var ct_id={{ct_id}}
+			// console.log(id)
+     	 $.ajax({ 
+	        url: "comment_add"//layui.setter.base + 'json/user/reg.js' //实际使用请改成服务端真实接口
+	        ,type:"POST"
+	        ,data: {content:x,id:ct_id}
+	        ,dataType:"json",
+	        success: function(res){        
+	          layer.msg('添加成功', {
+	          icon: 6
+	          ,time: 1000
+	    	  })
+              window.location.href = 'details?id={{ct_id}}';
+	        },
+	        error: function(res){
+	          layer.msg('添加失败', {
+	          icon: 6
+	          ,time: 1000
+	    	  })
+	        }
+	      });
+     	}
+	      // parent.layui.table.reload('LAY-app-content-list'); //重载表格
+	      // parent.layer.close(index); //再执行关闭 
+		
 	</script>
-	<script id="LAY-msg-tpl" type="text/html">
+<!-- 	<script id="LAY-msg-tpl" type="text/html">
 		<div class="info-box">
 			<div class="info-item">
 				<img class="info-img" src="{{ d_avatar }}" alt="">
@@ -148,6 +142,6 @@
 			  </div>
 			</div>
 		</div>
-	</script>
+	</script> -->
 </body>
 </html>
