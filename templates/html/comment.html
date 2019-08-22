@@ -4,16 +4,16 @@
 	<meta charset="UTF-8">
 	<title>评论-闲言轻博客</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" href="../res/layui/css/layui.css">
-	<link rel="stylesheet" href="../res/static/css/mian.css">
+	<link rel="stylesheet" href="../layuiadmin/res/layui/css/layui.css">
+	<link rel="stylesheet" href="../layuiadmin/res/static/css/mian.css">
 </head>
 <body class="lay-blog">
 		<div class="header">
 			<div class="header-wrap">
 				<h1 class="logo pull-left">
 					<a href="index">
-						<img src="../res/static/images/logo.png" alt="" class="logo-img">
-						<img src="../res/static/images/logo-text.png" alt="" class="logo-text">
+						<img src="../layuiadmin/res/static/images/logo.png" alt="" class="logo-img">
+						<img src="../layuiadmin/res/static/images/logo-text.png" alt="" class="logo-text">
 					</a>
 				</h1>
 				<form class="layui-form blog-seach pull-left" action="">
@@ -26,9 +26,9 @@
 				</form>
 				<div class="blog-nav pull-right">
 					<ul class="layui-nav pull-left">
-					  <li class="layui-nav-item layui-this"><a href="index.html">首页</a></li>
-					  <li class="layui-nav-item"><a href="message.html">留言</a></li>
-					  <li class="layui-nav-item"><a href="about.html">关于</a></li>
+					  <li class="layui-nav-item layui-this"><a href="index">首页</a></li>
+					  <li class="layui-nav-item"><a href="message">留言</a></li>
+					  <li class="layui-nav-item"><a href="about">关于</a></li>
 					</ul>
 					<a href="#" class="personal pull-left">
 						<i class="layui-icon layui-icon-username"></i>
@@ -41,9 +41,9 @@
 				</div>
 			</div>
 			<ul class="pop-nav" id="pop-nav">
-				<li><a href="index.html">首页</a></li>
-				<li><a href="message.html">留言</a></li>
-				<li><a href="about.html">关于</a></li>
+				<li><a href="index">首页</a></li>
+				<li><a href="message">留言</a></li>
+				<li><a href="about">关于</a></li>
 			</ul>
 		</div>
 		<div class="container-wrap">
@@ -56,7 +56,7 @@
 								<h3>{{comment_title}}</h3>
 								<h5>发布于：<span>{{comment_time}}</span></h5>
 								<p>{{comment_content}}</p>
-								<img src="../res/static/images/item.png" 
+								<img src="../layuiadmin/res/static/images/item.png" 
 								 alt="帅哥">
 								<div class="count layui-clear">
 									<span class="pull-left">阅读 <em>{{comment_see}}+</em></span>
@@ -88,12 +88,12 @@
 			</p>
 			<p><span>人生就是一场修行</span></p>
 		</div>
-	<script src="../res/layui/layui.js">
+	<script src="../layuiadmin/res/layui/layui.js">
 	</script>
-	<script src="../res/static/js/jquery-1.9.0.min.js"></script>
+	<script src="../layuiadmin/res/static/js/jquery-1.9.0.min.js"></script>
 	<script>
 		layui.config({
-		  base: '../res/static/js/' 
+		  base: '../layuiadmin/res/static/js/' 
 		}).use('blog');
 		function comment(dom){
 			// var text=$(dom).siblings("input[type='text']").val();//获取它的值

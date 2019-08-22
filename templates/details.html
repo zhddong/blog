@@ -4,17 +4,17 @@
 	<meta charset="UTF-8">
 	<title>评论-闲言轻博客</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" href="../res/layui/css/layui.css">
-	<link rel="stylesheet" href="../res/static/css/mian.css">
+	<link rel="stylesheet" href="../layuiadmin/res/layui/css/layui.css">
+	<link rel="stylesheet" href="../layuiadmin/res/static/css/mian.css">
 </head>
-<script src="../res/static/js/like.js"></script>
+<script src="../layuiadmin/res/static/js/like.js"></script>
 <body class="lay-blog">
 		<div class="header">
 			<div class="header-wrap">
 				<h1 class="logo pull-left">
 					<a href="index">
-						<img src="../res/static/images/logo.png" alt="" class="logo-img">
-						<img src="../res/static/images/logo-text.png" alt="" class="logo-text">
+						<img src="../layuiadmin/res/static/images/logo.png" alt="" class="logo-img">
+						<img src="../layuiadmin/res/static/images/logo-text.png" alt="" class="logo-text">
 					</a>
 				</h1>
 				<form class="layui-form blog-seach pull-left" action="">
@@ -55,7 +55,7 @@
 								<h3><a href="details.html">{{ct_title}}</a></h3>
 								<h5>发布于：<span>{{ct_time}}</span></h5>
 								<p>{{ct_content}}</p>
-								<!-- <img src="../res/static/images/item.png" alt=""> -->
+								<!-- <img src="../layuiadmin/res/static/images/item.png" alt=""> -->
 								<div class="count layui-clear">
 									<span class="pull-left">阅读 <em>{{ct_read}}+</em></span>
 									<span class="pull-right "><i class="layui-icon layui-icon-praise" onclick='javascript:fabulous({{ct_id}})'></i><em>{{ct_like}}</em></span>
@@ -69,7 +69,7 @@
 						</div>
 						<div id="LAY-msg-box">
 							<!-- <div class="info-item">
-								<img class="info-img" src="../res/static/images/info-img.png" alt="">
+								<img class="info-img" src="../layuiadmin/res/static/images/info-img.png" alt="">
 								<div class="info-text">
 									<p class="title count">
 										<span class="name">{{user_name}}</span>
@@ -93,13 +93,13 @@
 			</p>
 			<p><span>人生就是一场修行</span></p>
 		</div>
-	<script src="../res/layui/layui.js">
+	<script src="../layuiadmin/res/layui/layui.js">
 
 	</script>
-	<script src="../res/static/js/jquery-1.9.0.min.js"></script>
+	<script src="../layuiadmin/res/static/js/jquery-1.9.0.min.js"></script>
 	<script>
 		layui.config({
-		  base: '../res/static/js/' 
+		  base: '../layuiadmin/res/static/js/' 
 		}).use('blog');
 		var Singleton = function(){
 		this.index = 0;
@@ -134,7 +134,7 @@
 				// console.log("fkjhk",item);
 				html+="<div class='item'>"+
 					"<div class='info-item'>"+
-								"<img class='info-img' src='../res/static/images/info-img.png' alt=''>"+
+								"<img class='info-img' src='../layuiadmin/res/static/images/info-img.png' alt=''>"+
 								"<div class='info-text'>"+
 									"<p class='title count'>"+
 										"<span class='name'>"+item.name+"</span>"+

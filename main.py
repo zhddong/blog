@@ -8,12 +8,15 @@ from model.blog_user import User
 from model.blog_article import Article
 from model.blog_content_info import Content_info
 from model.blog_comment import Comment
+from model.blog_about import About
+from model.blog_message import Message
 from model.blog_class import Class
 from flask import make_response
 import json
 import types
 from flask import render_template
-app = Flask(__name__,template_folder="./templates",static_folder="./res")#flask框架的用法
+# app = Flask(__name__,template_folder="./templates",static_folder="./static")#flask框架的用法
+app = Flask(__name__,template_folder="./templates",static_folder="./layuiadmin")#flask框架的用法
 @app.route('/blog')
 def hello_world():
     return article2html()
@@ -57,6 +60,70 @@ def status_num(status):
         return 1
     else:
         return 0
+#加载主界面
+@app.route('/most_index', methods=['POST','GET'])
+def most_index():
+    if request.method == "POST":
+        pass
+    else:
+        return render_template('views/index.html',
+            )
+#后台控制显示文章
+@app.route('/app_list', methods=['POST','GET'])
+def app_list():
+    if request.method == "POST":
+        pass
+    else:
+        return render_template('views/app/content/list.html',
+            )
+#后台控制添加文章
+@app.route('/app_listform', methods=['POST','GET'])
+def app_listform():
+    if request.method == "POST":
+        pass
+    else:
+        return render_template('views/app/content/listform.html',
+            )
+#后台控制：评论
+@app.route('/app_comment', methods=['POST','GET'])
+def app_comment():
+    if request.method == "POST":
+        pass
+    else:
+        return render_template('views/app/content/comment.html',
+            )
+#后台控制：分类
+@app.route('/app_tags', methods=['POST','GET'])
+def app_tags():
+    if request.method == "POST":
+        pass
+    else:
+        return render_template('views/app/content/tags.html',
+            )
+#后台控制：分类添加
+@app.route('/app_tagsform', methods=['POST','GET'])
+def app_tagsform():
+    if request.method == "POST":
+        pass
+    else:
+        return render_template('views/app/content/tagsform.html',
+            )
+#后台控制：注册
+@app.route('/user_reg', methods=['POST','GET'])
+def user_reg():
+    if request.method == "POST":
+        pass
+    else:
+        return render_template('views/user/reg.html',
+            )
+#后台控制：登陆
+@app.route('/user_login', methods=['POST','GET'])
+def user_login():
+    if request.method == "POST":
+        pass
+    else:
+        return render_template('views/user/login.html',
+            )
 #显示文章内容以及评论内容
 @app.route('/details', methods=['POST','GET'])
 def details():
@@ -65,7 +132,7 @@ def details():
         page = request.form.get("page")
         blog_comment = Comment()
         comment = blog_comment.comments_query(ct_id)
-        print(ct_id)
+        # print(ct_id)
         if not comment:
             res = {"code": -1,
             "msg": "还没有评论",
@@ -132,7 +199,74 @@ def details():
 @app.route('/message', methods=['POST','GET'])
 def message():
     if request.method == "POST":
-        pass
+        # content = request.form.get("content")
+        page = request.form.get("page")
+        blog_message = Message()
+        # ip = request.remote_addr
+        # print(ip,content)
+        # blog_message.message_add(ip,content)
+        blog_message.commit()
+        data = blog_message.message_query()
+        # print(data)
+        if not data:
+            res = {"code": -1,
+            "msg": "还没有留言",
+            "count": 0,
+            "data": [] }
+            res = json.dumps(res)
+            response = make_response(res)
+            return response
+        n = list(data)
+        a = []
+        for i in n:
+            time = i[0]#更新时间
+            like= i[1]#点赞量
+            content = i[2]#留言内容
+            time = str(time)
+            articlecontent = {"time": time,
+            "like":like,"content":content[0:200]
+            }
+            # print(articlecontent)
+            a.append(articlecontent)
+        # print(a)
+        page = int(page)
+        page = page-1
+        b = page*3
+        c = a[b:b+3]
+        # print(c)
+        if not c:
+            res = {"code": -1,
+            "msg": "没有留言",
+            "count": 0,
+            "data": [] }
+        else:
+            res = {"code": 0,
+            "msg": "",
+            "count": 0,
+            "data": c }
+        # print(res)
+        res = json.dumps(res)
+        response = make_response(res)
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        return response
+    else:
+        return render_template('html/message.html',
+            )
+#留言添加
+@app.route('/message_add', methods=['POST','GET'])
+def message_add():
+    if request.method == "POST":
+        content = request.form.get("content")
+        blog_message = Message()
+        ip = request.remote_addr
+        print(ip,content)
+        blog_message.message_add(ip,content)
+        res = {"code": 0,
+            "msg": "",
+            "data": [] }
+        res = json.dumps(res)
+        response = make_response(res)
+        return response
     else:
         return render_template('html/message.html',
             )
@@ -142,7 +276,11 @@ def about():
     if request.method == "POST":
         pass
     else:
+        blog_about = About()
+        data = blog_about.about_query()
         return render_template('html/about.html',
+            about_title = data[0][0],
+            about_content = data[0][1]
             )
 #评论显示
 @app.route('/comment', methods=['POST','GET'])
@@ -155,7 +293,7 @@ def comment():
         data = blog_article.ct_details(ct_id)
         # blog_comment = Comment()
         # comment = blog_comment.comments_query(ct_id)
-        print(data)
+        # print(data)
         return render_template('html/comment.html',
             comment_like=data[0][6],
             comment_time=data[0][2],
@@ -215,9 +353,9 @@ def fabulous():
         hash.update(a.encode('utf-8'))
         combination = hash.hexdigest()
         data = blog_content_info.ip_address(ct_id,ip,combination)
-        print(data)
+        # print(data)
         state = {"state": data}
-        print(state)
+        # print(state)
         blog_content_info   .commit()
         res = {"code": 0,
             "msg": "",
@@ -239,14 +377,14 @@ def fabulous_query():
         # ct_like = request.args.get("like")
         blog_content_info = Content_info()
         data = blog_content_info.fabulous_query(ct_id)
-        print(data)
+        # print(data)
         state = {"state": data}
-        print(state)
+        # print(state)
         blog_content_info.commit()
         res = {"code": 0,
             "msg": "",
             "data": state }
-        print(res)
+        # print(res)
         res = json.dumps(res)
         response = make_response(res)
         response.headers["Access-Control-Allow-Origin"] = "*"
@@ -355,7 +493,7 @@ def classification_name():
     else:
         name = request.args.get("tags")
     blog_class = Class()
-    print(name)
+    # print(name)
     blog_class.insert(name)
     res = {"code": 0,
         "msg": "",
@@ -438,6 +576,7 @@ def content_list():
         a.append(articlecontent)
         # print(articlecontent)
     page = int(page)
+    # print(page)
     page = page-1
     b = page*10
     # print(b)
@@ -459,7 +598,7 @@ def content_list():
 @app.route('/delete_articles', methods=['POST', 'GET'])
 def delete_articles():
     delete_id = request.form.get("id")
-    print(delete_id)
+    # print(delete_id)
     blog_article = Article()
     blog_article.delete(delete_id)  
     res = {"code": 0,
@@ -487,7 +626,7 @@ def content_modify():
     label_id = transformation(label)
     class_id = transformation1(classification)
     # print(label_id)
-    print(user_id,title,class_id,content,label_id,status,article_id)
+    # print(user_id,title,class_id,content,label_id,status,article_id)
     blog_article.modify(user_id,title,class_id,content,label_id,status,article_id)
     # return "kkk"
     res = {"code": 0,
