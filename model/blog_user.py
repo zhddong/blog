@@ -14,11 +14,25 @@ class User(object):
 	def insert(self,password,nickname,phone):
 		sql = "INSERT INTO `user`( `passwd`, `name`,  `phone`) VALUES {}"
 		op_sql = sql.format((password, nickname,phone))
-
-
 		try:
 			self.cursor.execute(op_sql)
  		
+		except Exception as e:
+			print(sql,e)
+	def query(self,password,name):
+		sql = "SELECT `passwd`, `name` FROM `user` WHERE `passwd` = %s  and `name` = %s"
+		try:
+			self.cursor.execute(sql,(password,name))
+			data = self.cursor.fetchall()
+			return data
+		except Exception as e:
+			print(sql,e)
+	def app_index(self,name):
+		sql = "SELECT `name` FROM `user` WHERE `name` = %s"
+		try:
+			self.cursor.execute(sql,(name))
+			data = self.cursor.fetchall()
+			return data
 		except Exception as e:
 			print(sql,e)
 	def commit(self):

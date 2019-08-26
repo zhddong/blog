@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #导入模板模块
-from flask import Flask
+from flask import Flask,session
 import hashlib
 from flask import request
 from control.markdown2html import article2html
@@ -12,11 +12,14 @@ from model.blog_about import About
 from model.blog_message import Message
 from model.blog_class import Class
 from flask import make_response
-import json
+from datetime import timedelta
+import json,os
 import types
 from flask import render_template
 # app = Flask(__name__,template_folder="./templates",static_folder="./static")#flask框架的用法
 app = Flask(__name__,template_folder="./templates",static_folder="./layuiadmin")#flask框架的用法
+app.config['SECRET_KEY']=os.urandom(24)   #设置为24位的字符,每次运行服务器都是不同的，所以服务器启动一次上次的session就清除。
+app.config['PERMANENT_SESSION_LIFETIME']=timedelta(days=7) #设置session的保存时间。
 @app.route('/blog')
 def hello_world():
     return article2html()
@@ -68,13 +71,56 @@ def most_index():
     else:
         return render_template('views/index.html',
             )
+#后台跳转
+@app.route('/app_index', methods=['POST','GET'])
+def app_index():
+    if request.method == "POST":
+        session.get('username')
+        blog_user = User()
+        data = blog_user.app_index(name)
+        state = {"state": 0}
+        states = {"state": 1}
+        if not data:
+            res = {"code": -1,
+            "msg": "没有权限",
+            "count": 0,
+            "data": state }
+            res = json.dumps(res)
+            response = make_response(res)
+            return response
+        else:
+            res = {"code": -1,
+            "msg": "",
+            "count": 0,
+            "data": states }
+            session.permanent=True  #默认session的时间持续31天
+            session['username'] = name
+            res = json.dumps(res)
+            response = make_response(res)
+            return response
+    else:
+        return render_template('views/app/content/list.html',
+            )
 #后台控制显示文章
 @app.route('/app_list', methods=['POST','GET'])
 def app_list():
     if request.method == "POST":
         pass
     else:
-        return render_template('views/app/content/list.html',
+        name = session.get('username')
+        blog_user = User()
+        data = blog_user.app_index(name)
+        # print(name)
+        if not data:
+            data_name=="Flask"
+        else:
+            data_name = data[0][0]
+            # print(data_name)s
+        if data_name=="happy":
+            return render_template('views/app/content/list.html',
+            )
+        else:
+            return render_template('html/404.html',
             )
 #后台控制添加文章
 @app.route('/app_listform', methods=['POST','GET'])
@@ -82,7 +128,20 @@ def app_listform():
     if request.method == "POST":
         pass
     else:
-        return render_template('views/app/content/listform.html',
+        name = session.get('username')
+        blog_user = User()
+        data = blog_user.app_index(name)
+        # print(name)
+        if not data:
+            data_name=="Flask"
+        else:
+            data_name = data[0][0]
+            # print(data_name)s
+        if data_name=="happy":
+            return render_template('views/app/content/listform.html',
+            )
+        else:
+            return render_template('html/404.html',
             )
 #后台控制：评论
 @app.route('/app_comment', methods=['POST','GET'])
@@ -90,7 +149,20 @@ def app_comment():
     if request.method == "POST":
         pass
     else:
-        return render_template('views/app/content/comment.html',
+        name = session.get('username')
+        blog_user = User()
+        data = blog_user.app_index(name)
+        # print(name)
+        if not data:
+            data_name=="Flask"
+        else:
+            data_name = data[0][0]
+            # print(data_name)s
+        if data_name=="happy":
+            return render_template('views/app/content/comment.html',
+            )
+        else:
+            return render_template('html/404.html',
             )
 #后台控制：分类
 @app.route('/app_tags', methods=['POST','GET'])
@@ -98,7 +170,20 @@ def app_tags():
     if request.method == "POST":
         pass
     else:
-        return render_template('views/app/content/tags.html',
+        name = session.get('username')
+        blog_user = User()
+        data = blog_user.app_index(name)
+        # print(name)
+        if not data:
+            data_name=="Flask"
+        else:
+            data_name = data[0][0]
+            # print(data_name)s
+        if data_name=="happy":
+            return render_template('views/app/content/tags.html',
+            )
+        else:
+            return render_template('html/404.html',
             )
 #后台控制：分类添加
 @app.route('/app_tagsform', methods=['POST','GET'])
@@ -106,7 +191,20 @@ def app_tagsform():
     if request.method == "POST":
         pass
     else:
-        return render_template('views/app/content/tagsform.html',
+        name = session.get('username')
+        blog_user = User()
+        data = blog_user.app_index(name)
+        # print(name)
+        if not data:
+            data_name=="Flask"
+        else:
+            data_name = data[0][0]
+            # print(data_name)s
+        if data_name=="happy":
+            return render_template('views/app/content/tagsform.html',
+            )
+        else:
+            return render_template('html/404.html',
             )
 #后台控制：注册
 @app.route('/user_reg', methods=['POST','GET'])
@@ -120,7 +218,35 @@ def user_reg():
 @app.route('/user_login', methods=['POST','GET'])
 def user_login():
     if request.method == "POST":
-        pass
+        name = request.form.get("username")
+        password = request.form.get("password")
+        vercode = request.form.get("vercode")
+        blog_user = User()
+        hash = hashlib.sha1()
+        hash.update(password.encode('utf-8'))
+        pass_wd = hash.hexdigest()
+        data = blog_user.query(pass_wd,name)
+        # print(data)
+        state = {"state": 0}
+        states = {"state": 1}
+        if not data:
+            res = {"code": -1,
+            "msg": "没有该用户",
+            "count": 0,
+            "data": state }
+            res = json.dumps(res)
+            response = make_response(res)
+            return response
+        else:
+            res = {"code": -1,
+            "msg": "",
+            "count": 0,
+            "data": states }
+            session.permanent=True  #默认session的时间持续31天
+            session['username'] = name
+            res = json.dumps(res)
+            response = make_response(res)
+            return response
     else:
         return render_template('views/user/login.html',
             )
@@ -259,7 +385,7 @@ def message_add():
         content = request.form.get("content")
         blog_message = Message()
         ip = request.remote_addr
-        print(ip,content)
+        # print(ip,content)
         blog_message.message_add(ip,content)
         res = {"code": 0,
             "msg": "",
@@ -360,7 +486,7 @@ def fabulous():
         res = {"code": 0,
             "msg": "",
             "data": state }
-        print(res)
+        # print(res)
         res = json.dumps(res)
         response = make_response(res)
         response.headers["Access-Control-Allow-Origin"] = "*"
@@ -408,6 +534,7 @@ def xianyan_dispaly():
         create_time = request.args.get("create_time")
         title = request.args.get("title")
         content = request.args.get("content")
+        page = request.args.get("page")
     blog_article = Article()
     data = blog_article.xianyan_display()
     # print(data)
@@ -431,7 +558,10 @@ def xianyan_dispaly():
         }
         # print(articlecontent)
         a.append(articlecontent)
-    page = int(page)
+    if  not page:
+        page  = 1
+    else:
+        page = int(page)
     page = page-1
     b = page*10
     c = a[b:b+10]
@@ -517,6 +647,21 @@ def content_list():
         req_title = request.args.get("title")
         req_label = request.args.get("label")
         page = request.args.get("page")
+        name = session.get('username')
+        blog_user = User()
+        data = blog_user.app_index(name)
+        # print(name)
+        if not data:
+            data_name=="Flask"
+        else:
+            data_name = data[0][0]
+            # print(data_name)s
+        if data_name=="happy":
+            return render_template('views/app/content/list.html',
+            )
+        else:
+            return render_template('html/404.html',
+            )
     # print(req_label)
     # print(fileds,req_id,label_id)
     # req_label = int(req_label)
@@ -575,7 +720,10 @@ def content_list():
         "status": status}
         a.append(articlecontent)
         # print(articlecontent)
-    page = int(page)
+    if  not page:
+        page  = 1
+    else:
+        page = int(page)
     # print(page)
     page = page-1
     b = page*10
@@ -639,27 +787,44 @@ def content_modify():
 # 实现文章的添加
 @app.route('/content', methods=['POST', 'GET'])
 def content():
-    title = request.form.get("title")
-    user_id = request.form.get("author")
-    content = request.form.get("content")
-    label = request.form.get("label")
-    classification = request.form.get("classification")
-    status = request.form.get("status")
-    status = status_num(status)
-    user_id = int (user_id)
-    blog_article = Article()
-    label_id = transformation(label)
-    class_id = transformation1(classification)
-    # print(label_id)
-    blog_article.increase(user_id,title,class_id,content,label_id,status)
-    # return "kkk"
-    res = {"code": 0,
-        "msg": "",
-        "data": [] }
-    res = json.dumps(res)
-    response = make_response(res)
-    response.headers["Access-Control-Allow-Origin"] = "*"
-    return response
+    if request=="POST":
+        title = request.form.get("title")
+        user_id = request.form.get("author")
+        content = request.form.get("content")
+        label = request.form.get("label")
+        classification = request.form.get("classification")
+        status = request.form.get("status")
+        status = status_num(status)
+        user_id = int (user_id)
+        blog_article = Article()
+        label_id = transformation(label)
+        class_id = transformation1(classification)
+        # print(label_id)
+        blog_article.increase(user_id,title,class_id,content,label_id,status)
+        # return "kkk"
+        res = {"code": 0,
+            "msg": "",
+            "data": [] }
+        res = json.dumps(res)
+        response = make_response(res)
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        return response
+    else:
+        name = session.get('username')
+        blog_user = User()
+        data = blog_user.app_index(name)
+        # print(name)
+        if not data:
+            data_name=="Flask"
+        else:
+            data_name = data[0][0]
+            # print(data_name)s
+        if data_name=="happy":
+            return render_template('views/app/content/listform.html',
+            )
+        else:
+            return render_template('html/404.html',
+            )
 def make_resdata(code,info):
     res = {}
     res["code"] = code
@@ -679,6 +844,15 @@ def reg():
         repass = request.form.get("repass")
         nickname = request.form.get("nickname")
         agreement = request.form.get("agreement")
+        if password != repass:
+            return make_resdata(0, "两次密码输入不一致")
+        hash = hashlib.sha1()
+        hash.update(password.encode('utf-8'))
+        pass_wd = hash.hexdigest() 
+        blog_user = User()
+        blog_user.insert(pass_wd,nickname,phone)
+        blog_user.commit()
+        return make_resdata(0, "success")
     else:
         phone = request.args.get("cellphone")
         vercode = request.args.get("vercode")
@@ -686,14 +860,7 @@ def reg():
         repass = request.args.get("repass")
         nickname = request.args.get("nickname")
         agreement = request.args.get("agreement")
-    if password != repass:
-        return make_resdata(0, "两次密码输入不一致")
-    hash = hashlib.sha1()
-    hash.update(password.encode('utf-8'))
-    pass_wd = hash.hexdigest() 
-    blog_user = User()
-    blog_user.insert(pass_wd,nickname,phone)
-    blog_user.commit()
-    return make_resdata(0, "success")
+        return render_template('views/user/reg.html',
+            )
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080, debug=True)
