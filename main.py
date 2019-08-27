@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #导入模板模块
 from flask import Flask,session
+from flask import redirect, url_for
 import hashlib
 from flask import request
 from control.markdown2html import article2html
@@ -14,15 +15,20 @@ from model.blog_class import Class
 from flask import make_response
 from datetime import timedelta
 import json,os
+import utils
 import types
+import cgi
 from flask import render_template
 # app = Flask(__name__,template_folder="./templates",static_folder="./static")#flask框架的用法
 app = Flask(__name__,template_folder="./templates",static_folder="./layuiadmin")#flask框架的用法
-app.config['SECRET_KEY']=os.urandom(24)   #设置为24位的字符,每次运行服务器都是不同的，所以服务器启动一次上次的session就清除。
-app.config['PERMANENT_SESSION_LIFETIME']=timedelta(days=7) #设置session的保存时间。
-@app.route('/blog')
-def hello_world():
-    return article2html()
+app.config['SECRET_KEY']="happy22"#os.urandom(24)   #设置为24位的字符,每次运行服务器都是不同的，所以服务器启动一次上次的session就清除。
+app.config['PERMANENT_SESSION_LIFETIME']=timedelta(days=180) #设置session的保存时间。
+
+all_user = User()
+
+# @app.route('/blog')
+# def hello_world():
+#     return article2html()
 # 实现便签类型的转换
 def transformation(label_id):
     if label_id == "星座":
@@ -73,6 +79,7 @@ def most_index():
             )
 #后台跳转
 @app.route('/app_index', methods=['POST','GET'])
+@utils.auth_wrapper(all_user.app_index,"auth")
 def app_index():
     if request.method == "POST":
         session.get('username')
@@ -103,109 +110,160 @@ def app_index():
             )
 #后台控制显示文章
 @app.route('/app_list', methods=['POST','GET'])
+@utils.auth_wrapper(all_user.app_index,"auth")
 def app_list():
     if request.method == "POST":
         pass
     else:
-        name = session.get('username')
-        blog_user = User()
-        data = blog_user.app_index(name)
-        # print(name)
-        if not data:
-            data_name=="Flask"
-        else:
-            data_name = data[0][0]
-            # print(data_name)s
-        if data_name=="happy":
-            return render_template('views/app/content/list.html',
-            )
-        else:
-            return render_template('html/404.html',
-            )
-#后台控制添加文章
+        return render_template('views/app/content/list.html',
+        )
+#后台控制添加文章(编辑文章)
 @app.route('/app_listform', methods=['POST','GET'])
+@utils.auth_wrapper(all_user.app_index,"auth")
 def app_listform():
     if request.method == "POST":
         pass
     else:
-        name = session.get('username')
-        blog_user = User()
-        data = blog_user.app_index(name)
-        # print(name)
-        if not data:
-            data_name=="Flask"
-        else:
-            data_name = data[0][0]
-            # print(data_name)s
-        if data_name=="happy":
-            return render_template('views/app/content/listform.html',
-            )
-        else:
-            return render_template('html/404.html',
-            )
+        return render_template('views/app/content/listform.html',
+        )
 #后台控制：评论
 @app.route('/app_comment', methods=['POST','GET'])
+@utils.auth_wrapper(all_user.app_index,"auth")
 def app_comment():
     if request.method == "POST":
         pass
     else:
-        name = session.get('username')
-        blog_user = User()
-        data = blog_user.app_index(name)
-        # print(name)
+        return render_template('views/app/content/comment.html',
+        )
+#后台控制：评论显示
+@app.route('/comments_all_query', methods=['POST','GET'])
+@utils.auth_wrapper(all_user.app_index,"auth")
+def comments_all_query():
+    if request.method == "POST":
+        com_id = request.form.get("id")
+        user_ip = request.form.get("reviewers")
+        content = request.form.get("content")
+        commtime = request.form.get("commtime")
+        page = request.form.get("page")
+        blog_comment = Comment()
+        data = blog_comment.comment_management()
         if not data:
-            data_name=="Flask"
+            res = {"code": -1,
+            "msg": "没有找到",
+            "count": 0,
+            "data": [] }
+        n = list(data)
+        a = []
+        for i in n:
+            id = i[0]#评论id
+            name = i[1]#评论者
+            content = i[2]#评论内容
+            create_time = i[3]#评论时间
+            # if  req_id and int(req_id) != id:
+            #     continue
+            # if  req_author and req_author != name:
+            #     continue
+            # if  req_title and req_title not in title:
+            #     continue
+            articlecontent = {"id": id,
+            "reviewers": name,
+            "content": content,
+            "commtime": create_time,}
+            a.append(articlecontent)
+            # print(articlecontent)
+        if  not page:
+            page  = 1
         else:
-            data_name = data[0][0]
-            # print(data_name)s
-        if data_name=="happy":
-            return render_template('views/app/content/comment.html',
-            )
+            page = int(page)
+        # print(page)
+        page = page-1
+        b = page*10
+        # print(b)
+        if not a:
+            res = {"code": -1,
+            "msg": "没有找到",
+            "count": 0,
+            "data": [] }
         else:
-            return render_template('html/404.html',
-            )
+            res = {"code": 0,
+            "msg": "",
+            "count": len(data),
+            "data": a[b:b+10] }
+        res = json.dumps(res)
+        response = make_response(res)
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        return response
+    else:
+        req_id = request.args.get("id")
+        user_ip = request.args.get("reviewers")
+        content = request.args.get("content")
+        commtime = request.args.get("commtime")
+        page = request.args.get("page")
+        blog_comment = Comment()
+        data = blog_comment.comment_management()
+        if not data:
+            res = {"code": -1,
+            "msg": "没有找到",
+            "count": 0,
+            "data": [] }
+        n = list(data)
+        a = []
+        for i in n:
+            id = i[0]#评论id
+            name = i[1]#评论者
+            content = i[2]#评论内容
+            create_time = i[3]#评论时间
+            create_time = str(create_time)
+            # if  req_id and int(req_id) != id:
+            #     continue
+            # if  req_author and req_author != name:
+            #     continue
+            # if  req_title and req_title not in title:
+            #     continue
+            articlecontent = {"id": id,
+            "reviewers": name,
+            "content": content,
+            "commtime": create_time,}
+            a.append(articlecontent)
+        if  not page:
+            page  = 1
+        else:
+            page = int(page)
+        page = page-1
+        b = page*10
+        if not a:
+            res = {"code": -1,
+            "msg": "没有找到",
+            "count": 0,
+            "data": [] }
+        else:
+            res = {"code": 0,
+            "msg": "",
+            "count": len(data),
+            "data": a[b:b+10] }
+        res = json.dumps(res)
+        response = make_response(res)
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        return response
 #后台控制：分类
 @app.route('/app_tags', methods=['POST','GET'])
+@utils.auth_wrapper(all_user.app_index,"auth")
 def app_tags():
     if request.method == "POST":
         pass
     else:
-        name = session.get('username')
-        blog_user = User()
-        data = blog_user.app_index(name)
-        # print(name)
-        if not data:
-            data_name=="Flask"
-        else:
-            data_name = data[0][0]
-            # print(data_name)s
-        if data_name=="happy":
-            return render_template('views/app/content/tags.html',
-            )
-        else:
-            return render_template('html/404.html',
-            )
+        return render_template('views/app/content/tags.html',
+        )
 #后台控制：分类添加
 @app.route('/app_tagsform', methods=['POST','GET'])
+@utils.auth_wrapper(all_user.app_index,"auth")
 def app_tagsform():
     if request.method == "POST":
         pass
     else:
-        name = session.get('username')
-        blog_user = User()
-        data = blog_user.app_index(name)
-        # print(name)
-        if not data:
-            data_name=="Flask"
-        else:
-            data_name = data[0][0]
-            # print(data_name)s
-        if data_name=="happy":
-            return render_template('views/app/content/tagsform.html',
-            )
-        else:
-            return render_template('html/404.html',
-            )
+        return render_template('views/app/content/tagsform.html',
+        )
+
 #后台控制：注册
 @app.route('/user_reg', methods=['POST','GET'])
 def user_reg():
@@ -309,6 +367,9 @@ def details():
             response = make_response(res,404)
             response.headers["Access-Control-Allow-Origin"] = "*"
             return response
+        # ct_content = ""
+        # for ct in data[0][1].split("\n"):
+        #     ct_content += "<p>" + ct + "</p>"
         return render_template('details.html',
             ct_title=data[0][0],
             ct_content=data[0][1],
@@ -316,9 +377,6 @@ def details():
             ct_read=data[0][5],
             ct_like=data[0][6],
             ct_id=ct_id
-            # user_name="happy",
-            # comment_like=560,
-            # comment_content="这篇文章写得好！！！"
             )
 
 #留言
@@ -409,8 +467,8 @@ def about():
             about_content = data[0][1]
             )
 #评论显示
-@app.route('/comment', methods=['POST','GET'])
-def comment():
+@app.route('/comments_query', methods=['POST','GET'])
+def comments_query():
     if request.method == "POST":
         pass
     else:
@@ -464,6 +522,10 @@ def comment_add():
             comment_title="公司客户",
             ct_id=99
             )
+
+@app.route('/', methods=['POST','GET'])
+def home_page():
+    return redirect(url_for("fabulous_query")) 
 #点赞
 @app.route('/index', methods=['POST','GET'])
 def fabulous():
@@ -582,6 +644,7 @@ def xianyan_dispaly():
     return response
 # 分类管理（取出）
 @app.route('/classification', methods=['POST', 'GET'])
+@utils.auth_wrapper(all_user.app_index,"auth")
 def classification():
     if request.method == "POST":
         req_id = request.form.get("id")
@@ -617,6 +680,7 @@ def classification():
     return response
 # 分类的添加
 @app.route('/classification_name', methods=['POST', 'GET'])
+@utils.auth_wrapper(all_user.app_index,"auth")
 def classification_name():
     if request.method == "POST":
         name = request.form.get("tags")
@@ -634,6 +698,7 @@ def classification_name():
     return response
 # 实现文章从数据库的取出
 @app.route('/content_list', methods=['POST', 'GET'])
+@utils.auth_wrapper(all_user.app_index,"auth")
 def content_list():
     if request.method == "POST":
         req_id = request.form.get("id")
@@ -641,109 +706,141 @@ def content_list():
         req_title = request.form.get("title")
         req_label = request.form.get("label")
         page = request.form.get("page")
+        blog_article = Article()
+        data = blog_article.data_all_display()
+        # print(data)
+        if not data:
+            res = {"code": -1,
+            "msg": "没有找到",
+            "count": 0,
+            "data": [] }
+            # res = json.dumps(res)
+            # response = make_response(res)
+            # response.headers["Access-Control-Allow-Origin"] = "*"
+            # return response
+        n = list(data)
+        a = []
+        for i in n:
+            id = i[0]#文章id
+            name = i[1]#作者
+            title = i[2]#文章标题
+            label = i[3]#标签
+            content = i[4]#文章内容
+            create_time = str(i[5])#创建时间
+            status = i[6]#文章状态
+            if  req_id and int(req_id) != id:
+                continue
+            if  req_author and req_author != name:
+                continue
+            if  req_title and req_title not in title:
+                continue
+            if  req_label and int(req_label) != label:
+                continue
+            # if req_author in name and req_id=None and req_label=None:
+                # data = blog_article.data_name_display(req_author)
+            # if req_author not in name:
+            #     continue
+            # if req_title not in title:
+            #     continue
+            # if status == 0:
+            #     status_0 = 0
+            # else:
+            #     status_0 = 1
+            label_id = transformation_2(label)
+            articlecontent = {"id": id,
+            "label": label_id,
+            "title": title,
+            "author": name,
+            "content": content,
+            "uploadtime": create_time,
+            "status": status}
+            a.append(articlecontent)
+            # print(articlecontent)
+        if  not page:
+            page  = 1
+        else:
+            page = int(page)
+        # print(page)
+        page = page-1
+        b = page*10
+        # print(b)
+        if not a:
+            res = {"code": -1,
+            "msg": "没有找到",
+            "count": 0,
+            "data": [] }
+        else:
+            res = {"code": 0,
+            "msg": "",
+            "count": len(data),
+            "data": a[b:b+10] }
+        res = json.dumps(res)
+        response = make_response(res)
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        return response
     else:
         req_id = request.args.get("id")
         req_author = request.args.get("author")
         req_title = request.args.get("title")
         req_label = request.args.get("label")
         page = request.args.get("page")
-        name = session.get('username')
-        blog_user = User()
-        data = blog_user.app_index(name)
-        # print(name)
+        blog_article = Article()
+        data = blog_article.data_all_display()
         if not data:
-            data_name=="Flask"
+            res = {"code": -1,
+            "msg": "没有找到",
+            "count": 0,
+            "data": [] }
+        n = list(data)
+        a = []
+        for i in n:
+            id = i[0]#文章id
+            name = i[1]#作者
+            title = i[2]#文章标题
+            label = i[3]#标签
+            content = i[4]#文章内容
+            create_time = str(i[5])#创建时间
+            status = i[6]#文章状态
+            if  req_id and int(req_id) != id:
+                continue
+            if  req_author and req_author != name:
+                continue
+            if  req_title and req_title not in title:
+                continue
+            if  req_label and int(req_label) != label:
+                continue
+            label_id = transformation_2(label)
+            articlecontent = {"id": id,
+            "label": label_id,
+            "title": title,
+            "author": name,
+            "content": content,
+            "uploadtime": create_time,
+            "status": status}
+            a.append(articlecontent)
+        if  not page:
+            page  = 1
         else:
-            data_name = data[0][0]
-            # print(data_name)s
-        if data_name=="happy":
-            return render_template('views/app/content/list.html',
-            )
+            page = int(page)
+        page = page-1
+        b = page*10
+        if not a:
+            res = {"code": -1,
+            "msg": "没有找到",
+            "count": 0,
+            "data": [] }
         else:
-            return render_template('html/404.html',
-            )
-    # print(req_label)
-    # print(fileds,req_id,label_id)
-    # req_label = int(req_label)
-    blog_article = Article()
-    # fileds = (req_id,req_label)
-    # if req_id and req_label !=None:
-    # print(page) 
-    #     data = blog_article.data_display(fileds)
-    # else:
-    data = blog_article.data_all_display()
-    # print(data)
-    if not data:
-        res = {"code": -1,
-        "msg": "没有找到",
-        "count": 0,
-        "data": [] }
-        # res = json.dumps(res)
-        # response = make_response(res)
-        # response.headers["Access-Control-Allow-Origin"] = "*"
-        # return response
-    n = list(data)
-    a = []
-    for i in n:
-        id = i[0]#文章id
-        name = i[1]#作者
-        title = i[2]#文章标题
-        label = i[3]#标签
-        content = i[4]#文章内容
-        create_time = str(i[5])#创建时间
-        status = i[6]#文章状态
-        if  req_id and int(req_id) != id:
-            continue
-        if  req_author and req_author != name:
-            continue
-        if  req_title and req_title not in title:
-            continue
-        if  req_label and int(req_label) != label:
-            continue
-        # if req_author in name and req_id=None and req_label=None:
-            # data = blog_article.data_name_display(req_author)
-        # if req_author not in name:
-        #     continue
-        # if req_title not in title:
-        #     continue
-        # if status == 0:
-        #     status_0 = 0
-        # else:
-        #     status_0 = 1
-        label_id = transformation_2(label)
-        articlecontent = {"id": id,
-        "label": label_id,
-        "title": title,
-        "author": name,
-        "content": content,
-        "uploadtime": create_time,
-        "status": status}
-        a.append(articlecontent)
-        # print(articlecontent)
-    if  not page:
-        page  = 1
-    else:
-        page = int(page)
-    # print(page)
-    page = page-1
-    b = page*10
-    # print(b)
-    if not a:
-        res = {"code": -1,
-        "msg": "没有找到",
-        "count": 0,
-        "data": [] }
-    else:
-        res = {"code": 0,
-        "msg": "",
-        "count": len(data),
-        "data": a[b:b+10] }
-    res = json.dumps(res)
-    response = make_response(res)
-    response.headers["Access-Control-Allow-Origin"] = "*"
-    return response
+            res = {"code": 0,
+            "msg": "",
+            "count": len(data),
+            "data": a[b:b+10] }
+        res = json.dumps(res)
+        response = make_response(res)
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        return response    
 # 文章的删除
 @app.route('/delete_articles', methods=['POST', 'GET'])
+@utils.auth_wrapper(all_user.app_index,"auth")
 def delete_articles():
     delete_id = request.form.get("id")
     # print(delete_id)
@@ -758,34 +855,43 @@ def delete_articles():
     return response
 #实现文章的修改
 @app.route('/content_modify', methods=['POST', 'GET'])
+@utils.auth_wrapper(all_user.app_index,"auth")
 def content_modify():
-    title = request.form.get("title")
-    user_id = request.form.get("author")
-    content = request.form.get("content")
-    label = request.form.get("label")
-    classification = request.form.get("classification")
-    status = request.form.get("status")
-    status = status_num(status)
-    # print(user_id)
-    user_id = int (user_id)
-    article_id = request.form.get("id")
-    # print(Data_acquired)
-    blog_article = Article()
-    label_id = transformation(label)
-    class_id = transformation1(classification)
-    # print(label_id)
-    # print(user_id,title,class_id,content,label_id,status,article_id)
-    blog_article.modify(user_id,title,class_id,content,label_id,status,article_id)
-    # return "kkk"
-    res = {"code": 0,
-        "msg": "",
-        "data": [] }
-    res = json.dumps(res)
-    response = make_response(res)
-    response.headers["Access-Control-Allow-Origin"] = "*"
-    return response
+    if request=="POST":
+        title = request.form.get("title")
+        user_id = request.form.get("author")
+        content = request.form.get("content")
+        label = request.form.get("label")
+        classification = request.form.get("classification")
+        status = request.form.get("status")
+        status = status_num(status)
+        # print(user_id)
+        if not user_id:
+            user_id = 0
+        else:
+            user_id = int (user_id)
+        article_id = request.form.get("id")
+        # print(Data_acquired)
+        blog_article = Article()
+        label_id = transformation(label)
+        class_id = transformation1(classification)
+        # print(label_id)
+        # print(user_id,title,class_id,content,label_id,status,article_id)
+        blog_article.modify(user_id,title,class_id,content,label_id,status,article_id)
+        # return "kkk"
+        res = {"code": 0,
+            "msg": "",
+            "data": [] }
+        res = json.dumps(res)
+        response = make_response(res)
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        return response
+    else:
+        return render_template('views/app/content/listform.html',
+        )
 # 实现文章的添加
 @app.route('/content', methods=['POST', 'GET'])
+@utils.auth_wrapper(all_user.app_index,"auth")
 def content():
     if request=="POST":
         title = request.form.get("title")
@@ -796,12 +902,11 @@ def content():
         status = request.form.get("status")
         status = status_num(status)
         user_id = int (user_id)
+        content = cgi.escape(content)
         blog_article = Article()
         label_id = transformation(label)
         class_id = transformation1(classification)
-        # print(label_id)
         blog_article.increase(user_id,title,class_id,content,label_id,status)
-        # return "kkk"
         res = {"code": 0,
             "msg": "",
             "data": [] }
@@ -810,21 +915,27 @@ def content():
         response.headers["Access-Control-Allow-Origin"] = "*"
         return response
     else:
-        name = session.get('username')
-        blog_user = User()
-        data = blog_user.app_index(name)
-        # print(name)
-        if not data:
-            data_name=="Flask"
-        else:
-            data_name = data[0][0]
-            # print(data_name)s
-        if data_name=="happy":
-            return render_template('views/app/content/listform.html',
-            )
-        else:
-            return render_template('html/404.html',
-            )
+        title = request.args.get("title")
+        user_id = request.args.get("author")
+        content = request.args.get("content")
+        label = request.args.get("label")
+        classification = request.args.get("classification")
+        status = request.args.get("status")
+        status = status_num(status)
+        user_id = int (user_id)
+        content = cgi.escape(content)
+        print(content)
+        blog_article = Article()
+        label_id = transformation(label)
+        class_id = transformation1(classification)
+        blog_article.increase(user_id,title,class_id,content,label_id,status)
+        res = {"code": 0,
+            "msg": "",
+            "data": [] }
+        res = json.dumps(res)
+        response = make_response(res)
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        return response
 def make_resdata(code,info):
     res = {}
     res["code"] = code
@@ -862,5 +973,8 @@ def reg():
         agreement = request.args.get("agreement")
         return render_template('views/user/reg.html',
             )
+@app.route('/auth', methods=['POST', 'GET'])
+def auth():
+    return "你没有权限！！！"
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080, debug=True)

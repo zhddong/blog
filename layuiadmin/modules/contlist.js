@@ -16,7 +16,7 @@ layui.define(['table', 'form'], function(exports){
   //文章管理
   table.render({
     elem: '#LAY-app-content-list'
-    ,url: "http://127.0.0.1:8080/content_list"//layui.setter.base + 'json/content/list.js' //模拟接口
+    ,url: "content_list"//layui.setter.base + 'json/content/list.js' //模拟接口
     ,cols: [[
       {type: 'checkbox', fixed: 'left'}
       ,{field: 'id', width: 100, title: '文章ID', sort: true}
@@ -63,7 +63,7 @@ layui.define(['table', 'form'], function(exports){
       layer.open({
         type: 2
         ,title: '编辑文章'
-        ,content: '../../../views/app/content/listform.html?id='+ data.id
+        ,content: 'app_listform?id='+ data.id
         ,maxmin: true
         ,area: ['550px', '550px']
         ,btn: ['确定', '取消']
@@ -174,7 +174,7 @@ layui.define(['table', 'form'], function(exports){
   //评论管理
   table.render({
     elem: '#LAY-app-content-comm'
-    ,url: layui.setter.base + 'json/content/comment.js' //模拟接口
+    ,url: "comments_all_query"//layui.setter.base + 'json/content/comment.js' //模拟接口
     ,cols: [[
       {type: 'checkbox', fixed: 'left'}
       ,{field: 'id', width: 100, title: 'ID', sort: true}

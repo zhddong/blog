@@ -27,10 +27,10 @@ class User(object):
 			return data
 		except Exception as e:
 			print(sql,e)
-	def app_index(self,name):
-		sql = "SELECT `name` FROM `user` WHERE `name` = %s"
+	def app_index(self):
+		sql = "SELECT `name` FROM `user` WHERE `admin`=1"
 		try:
-			self.cursor.execute(sql,(name))
+			self.cursor.execute(sql)
 			data = self.cursor.fetchall()
 			return data
 		except Exception as e:

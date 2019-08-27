@@ -29,5 +29,14 @@ class Comment(object):
             return data
         except Exception as e:
             print(sql,e,) 
+    def comment_management(self):
+        sql = """SELECT id,user_ip,content,create_time
+        FROM comment WHERE 1"""
+        try:
+            self.cursor.execute(sql)
+            data = self.cursor.fetchall()
+            return data
+        except Exception as e:
+            print(sql,e,)
     def commit(self):
         self.conn.commit()

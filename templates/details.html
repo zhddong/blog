@@ -10,6 +10,7 @@
 <script src="../layuiadmin/res/static/js/like.js"></script>
 <body class="lay-blog">
 		<div class="header">
+
 			<div class="header-wrap">
 				<h1 class="logo pull-left">
 					<a href="index">
@@ -31,7 +32,7 @@
 					  <li class="layui-nav-item"><a href="message">留言</a></li>
 					  <li class="layui-nav-item"><a href="about">关于</a></li>
 					</ul>
-					<a href="#" class="personal pull-left">
+					<a href="app_list" class="personal pull-left">
 						<i class="layui-icon layui-icon-username"></i>
 					</a>
 				</div>
@@ -52,9 +53,12 @@
 					<div class="contar-wrap">
 						<div class="item">
 							<div class="item-box  layer-photos-demo1 layer-photos-demo">
-								<h3><a href="details.html">{{ct_title}}</a></h3>
+								<h3><a>{{ct_title}}</a></h3>
 								<h5>发布于：<span>{{ct_time}}</span></h5>
-								<p>{{ct_content}}</p>
+								<div id="id_ct_dfd34dfdcontent">
+									{{ct_content}}
+								</div>
+								
 								<!-- <img src="../layuiadmin/res/static/images/item.png" alt=""> -->
 								<div class="count layui-clear">
 									<span class="pull-left">阅读 <em>{{ct_read}}+</em></span>
@@ -68,16 +72,7 @@
 							<a href="comment?id={{ ct_id }}" class="pull-right">写评论</a>
 						</div>
 						<div id="LAY-msg-box">
-							<!-- <div class="info-item">
-								<img class="info-img" src="../layuiadmin/res/static/images/info-img.png" alt="">
-								<div class="info-text">
-									<p class="title count">
-										<span class="name">{{user_name}}</span>
-										<span class="info-img like"><i class="layui-icon layui-icon-praise"></i>{{comment_like}}</span>
-									</p>
-									<p class="info-intr">{{comment_content}}</p>
-								</div>
-							</div>	 -->			
+									
 						</div>
 						<div class="item-btn">
 						<button class="layui-btn layui-btn-normal" onclick="javascript:button_onclick()">下一页</button>
@@ -143,12 +138,9 @@
 									"<p class='info-intr'>"+item.content+"</p>"+
 								"</div>"+
 					"</div>"
-
+ 
 			});
-			// $('.container-wrap .contar-wrap').empty () ;
-			// $('.container-wrap .contar-wrap').replaceWith(html,function(index) {}) ;
 			document.getElementById("LAY-msg-box").innerHTML=html ;
-			// $('.container-wrap .contar-wrap').after (html) ;
         }
 	    })
 		}

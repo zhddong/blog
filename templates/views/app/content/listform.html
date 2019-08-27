@@ -88,15 +88,32 @@
       //提交 Ajax 成功后，关闭当前弹层并重载表格
       // $.ajax({});
       //请求接口
+      // $.ajax({ 
+      //   url: "content"//layui.setter.base + 'json/user/reg.js' //实际使用请改成服务端真实接口
+      //   ,type:"POST"
+      //   ,data: field
+      //   ,dataType:"json",
+      //   success: function (data) {
+      //     layer.msg('点赞成功', {
+      //       icon: 6
+      //       ,time: 1000
+      //     })
+      //   }
       admin.req({
         url: "content"//layui.setter.base + 'json/user/reg.js' //实际使用请改成服务端真实接口
-        ,type:"post"
+        ,type:"get"
         ,data: field
         ,done: function(res){        
-          alert("添加成功");
+          layer.msg('添加成功', {
+            icon: 6
+            ,time: 1000
+          });
         },
         error: function(res){
-          alert("添加失败");
+          layer.msg('添加失败', {
+            icon: 6
+            ,time: 1000
+          });
         }
       });
       parent.layui.table.reload('LAY-app-content-list'); //重载表格
