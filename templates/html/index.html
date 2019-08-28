@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>闲言轻博客</title>
+	<title>zhddong轻博客</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../layuiadmin/res/layui/css/layui.css">
 	<link rel="stylesheet" href="../layuiadmin/res/static/css/mian.css">
@@ -181,7 +181,7 @@
 		}
 		function button_onclick(){
 		$.ajax({
-        url: "http://127.0.0.1:8080/xianyan_dispaly",
+        url: "xianyan_dispaly",
         type: "POST",
         data: {page:Singleton.getInstance().getIndex()},
         dataType: "json",

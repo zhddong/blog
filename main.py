@@ -359,8 +359,8 @@ def details():
         ct_id = request.args.get("id")
         blog_article = Article()
         data = blog_article.ct_details(ct_id)
-        blog_comment = Comment()
-        comment = blog_comment.comments_query(ct_id)
+        # blog_comment = Comment()
+        # comment = blog_comment.comments_query(ct_id)
         # print(comment)
         if not data:
             res = "该文章不存在！！！"
@@ -378,6 +378,49 @@ def details():
             ct_like=data[0][6],
             ct_id=ct_id
             )
+#单篇文章显示(有格式)
+@app.route('/details_article', methods=['POST','GET'])
+def details_article():
+    if request.method == "POST":
+        ct_id = request.form.get("id")
+        blog_article = Article()
+        data = blog_article.ct_details(ct_id)
+        blog_content_info = Content_info()
+        n = list(data)
+        a = []
+        for i in n:
+            title = i[0]#标题
+            content= i[1]#文章内容
+            create_time = i[2]#创建时间
+            content_id = i[4]#文章ID
+            read = i[5]#阅读量
+            like = i[6]#点赞量
+            is_like = blog_content_info.fabulous_query(content_id)
+            if not is_like:
+                is_like = 0
+            else:
+                is_like = 1
+            create_time = str(create_time)
+            articlecontent = {"create_time": create_time,
+            "title":title,"content":content,"read":read,
+            "id":content_id ,"is_like":is_like,"like":like
+            }
+            # print(articlecontent)
+            a.append(articlecontent)
+        if not a:
+            res = {"code": -1,
+            "msg": "没有找到",
+            "count": 0,
+            "data": [] }
+        else:
+            res = {"code": 0,
+            "msg": "",
+            "count": len(data),
+            "data": a}
+        res = json.dumps(res)
+        response = make_response(res)
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        return response
 
 #留言
 @app.route('/message', methods=['POST','GET'])
@@ -467,25 +510,25 @@ def about():
             about_content = data[0][1]
             )
 #评论显示
-@app.route('/comments_query', methods=['POST','GET'])
-def comments_query():
-    if request.method == "POST":
-        pass
-    else:
-        ct_id = request.args.get("id")
-        blog_article = Article()
-        data = blog_article.ct_details(ct_id)
-        # blog_comment = Comment()
-        # comment = blog_comment.comments_query(ct_id)
-        # print(data)
-        return render_template('html/comment.html',
-            comment_like=data[0][6],
-            comment_time=data[0][2],
-            comment_content=data[0][1],
-            comment_see=data[0][5],
-            comment_title=data[0][0],
-            ct_id=ct_id
-            )
+# @app.route('/comments_query', methods=['POST','GET'])
+# def comments_query():
+#     if request.method == "POST":
+#         pass
+#     else:
+#         ct_id = request.args.get("id")
+#         blog_article = Article()
+#         data = blog_article.ct_details(ct_id)
+#         # blog_comment = Comment()
+#         # comment = blog_comment.comments_query(ct_id)
+#         # print(data)
+#         return render_template('html/comment.html',
+#             comment_like=data[0][6],
+#             comment_time=data[0][2],
+#             comment_content=data[0][1],
+#             comment_see=data[0][5],
+#             comment_title=data[0][0],
+#             ct_id=ct_id
+#             )
 #评论添加
 @app.route('/comment_add', methods=['POST','GET'])
 def comment_add():

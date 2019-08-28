@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>评论-闲言轻博客</title>
+	<title>评论-zhddong轻博客</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../layuiadmin/res/layui/css/layui.css">
 	<link rel="stylesheet" href="../layuiadmin/res/static/css/mian.css">
@@ -51,25 +51,28 @@
 		<div class="container-wrap">
 			<div class="container container-message container-details">
 					<div class="contar-wrap">
-						<div class="item">
+						<!-- <div class="item">
 							<div class="item-box  layer-photos-demo1 layer-photos-demo">
 								<h3><a>{{ct_title}}</a></h3>
-								<h5>发布于：<span>{{ct_time}}</span></h5>
-								<div id="id_ct_dfd34dfdcontent">
+								<h5>发布于：<span>{{ct_time}}</span></h5> -->
+							<!-- 	<div id="id_ct_dfd34dfdcontent">
 									{{ct_content}}
-								</div>
+								</div> -->
 								
 								<!-- <img src="../layuiadmin/res/static/images/item.png" alt=""> -->
-								<div class="count layui-clear">
+								<!-- <div class="count layui-clear">
 									<span class="pull-left">阅读 <em>{{ct_read}}+</em></span>
 									<span class="pull-right "><i class="layui-icon layui-icon-praise" onclick='javascript:fabulous({{ct_id}})'></i><em>{{ct_like}}</em></span>
 								</div>
 							</div>
-						</div>	
+						</div>	 -->
+						<div id="LAY-msg-boxs">
+									
+						</div>
 						<a name="comment"> </a>
 						<div class="comt layui-clear">
 							<a href="javascript:;" class="pull-left">评论</a>
-							<a href="comment?id={{ ct_id }}" class="pull-right">写评论</a>
+							<a href="comment_add?id={{ ct_id }}" class="pull-right">写评论</a>
 						</div>
 						<div id="LAY-msg-box">
 									
@@ -116,6 +119,34 @@
 		　　　　　　 }
 		})();
 		var ct_id={{ct_id}};
+		content_markdown()
+		function content_markdown(){
+		$.ajax({ 
+        url: "details_article"//layui.setter.base + 'json/user/reg.js' //实际使用请改成服务端真实接口
+        ,type:"POST"
+        ,data: {id:ct_id}
+        ,dataType:"json"
+        ,success: function(data){
+        	var html='';
+			$.each(data.data,function(index, item){
+				// console.log("fkjhk",item);
+				html+="<div class='item'>"+
+					"<div class='item-box  layer-photos-demo1 layer-photos-demo'>"+
+										"<h3><a href='http://127.0.0.1:8080/details?id="+item.id+"'>"+item.title+"</a></h3>"+
+										"<h5>发布于：<span>"+item.create_time+"</span></h5>"+
+										"<p class='info-intr'>"+item.content+"</p>"+
+									"</div>"+
+									"<div class='comment count'>"+
+										"<span class='pull-left'>阅读 <em>"+item.read+"</em></span>"+
+										"<span class='pull-right'><i class='layui-icon layui-icon-praise'></i><em>"+item.like+"</em></span>"+
+									"</div>"+
+								"</div>";
+
+			});
+			document.getElementById("LAY-msg-boxs").innerHTML=html ;
+    	}	
+		})
+		}
 		button_onclick()
 		function button_onclick(){
 		$.ajax({ 
