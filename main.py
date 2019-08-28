@@ -386,9 +386,9 @@ def details_article():
         blog_article = Article()
         data = blog_article.ct_details(ct_id)
         blog_content_info = Content_info()
-        n = list(data)
-        a = []
-        for i in n:
+        data = list(data)
+        data_new = []
+        for i in data:
             title = i[0]#标题
             content= i[1]#文章内容
             create_time = i[2]#创建时间
@@ -406,8 +406,8 @@ def details_article():
             "id":content_id ,"is_like":is_like,"like":like
             }
             # print(articlecontent)
-            a.append(articlecontent)
-        if not a:
+            data_new.append(articlecontent)
+        if not data_new:
             res = {"code": -1,
             "msg": "没有找到",
             "count": 0,
@@ -416,7 +416,7 @@ def details_article():
             res = {"code": 0,
             "msg": "",
             "count": len(data),
-            "data": a}
+            "data": data_new}
         res = json.dumps(res)
         response = make_response(res)
         response.headers["Access-Control-Allow-Origin"] = "*"

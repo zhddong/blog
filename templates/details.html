@@ -122,14 +122,13 @@
 		content_markdown()
 		function content_markdown(){
 		$.ajax({ 
-        url: "details_article"//layui.setter.base + 'json/user/reg.js' //实际使用请改成服务端真实接口
+        url: "details_article"
         ,type:"POST"
         ,data: {id:ct_id}
         ,dataType:"json"
         ,success: function(data){
         	var html='';
 			$.each(data.data,function(index, item){
-				// console.log("fkjhk",item);
 				html+="<div class='item'>"+
 					"<div class='item-box  layer-photos-demo1 layer-photos-demo'>"+
 										"<h3><a href='http://127.0.0.1:8080/details?id="+item.id+"'>"+item.title+"</a></h3>"+
@@ -150,14 +149,13 @@
 		button_onclick()
 		function button_onclick(){
 		$.ajax({ 
-        url: "details"//layui.setter.base + 'json/user/reg.js' //实际使用请改成服务端真实接口
+        url: "details"
         ,type:"POST"
         ,data: {id:ct_id,page:Singleton.getInstance().getIndex()}
         ,dataType:"json"
         ,success: function(data){
         	var html='';
 			$.each(data.data,function(index, item){
-				// console.log("fkjhk",item);
 				html+="<div class='item'>"+
 					"<div class='info-item'>"+
 								"<img class='info-img' src='../layuiadmin/res/static/images/info-img.png' alt=''>"+
@@ -169,7 +167,6 @@
 									"<p class='info-intr'>"+item.content+"</p>"+
 								"</div>"+
 					"</div>"
- 
 			});
 			document.getElementById("LAY-msg-box").innerHTML=html ;
         }
