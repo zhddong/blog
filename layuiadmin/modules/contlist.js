@@ -1,5 +1,4 @@
-  /**
-
+ /**
  @Name：layuiAdmin 内容系统
  @Author：star1029
  @Site：http://www.layui.com/admin/
@@ -41,14 +40,20 @@ layui.define(['table', 'form'], function(exports){
       layer.confirm('确定删除此文章？', function(index){
         // obj.del();
         $.ajax({ 
-        url: "http://127.0.0.1:8080/delete_articles"//layui.setter.base + 'json/user/reg.js' //实际使用请改成服务端真实接口
+        url: "delete_articles"//layui.setter.base + 'json/user/reg.js' //实际使用请改成服务端真实接口
         ,type:"post"
         ,data: data
         ,done: function(res){
-          alert("删除成功");
+          layer.msg('删除成功', {
+            icon: 6
+            ,time: 1000
+          });
         },
         error: function(res){
-          alert("删除失败");
+          layer.msg('删除失败', {
+            icon: 6
+            ,time: 1000
+          });
         }
         });
         table.reload('LAY-app-content-list', {
@@ -89,14 +94,20 @@ layui.define(['table', 'form'], function(exports){
             console.log(new_field)
             //提交 Ajax 成功后，静态更新表格中的数据
             $.ajax({ 
-            url: "http://127.0.0.1:8080/content_modify"//layui.setter.base + 'json/user/reg.js' //实际使用请改成服务端真实接口
-            ,type:"post"
+            url: "content_modify"//layui.setter.base + 'json/user/reg.js' //实际使用请改成服务端真实接口
+            ,type:"get"
             ,data: new_field
             ,done: function(res){        
-              alert("修改成功");
+              layer.msg('修改成功', {
+                icon: 6
+                ,time: 1000
+              });
             },
             error: function(res){
-              alert("修改失败");
+              layer.msg('修改失败', {
+                icon: 6
+                ,time: 1000
+              });
             }
             });     
           // obj.update({
@@ -139,7 +150,28 @@ layui.define(['table', 'form'], function(exports){
     var data = obj.data;
     if(obj.event === 'del'){
       layer.confirm('确定删除此分类？', function(index){
-        obj.del();
+        $.ajax({ 
+        url: "tagsform_delete"//layui.setter.base + 'json/user/reg.js' //实际使用请改成服务端真实接口
+        ,type:"post"
+        ,data: data
+        ,done: function(res){
+          layer.msg('删除成功', {
+            icon: 6
+            ,time: 1000
+          });
+        },
+        error: function(res){
+          layer.msg('删除失败', {
+            icon: 6
+            ,time: 1000
+          });
+        }
+        });
+        table.reload('LAY-app-content-tags', {
+            page: {
+            curr: 1 //重新从第 1 页开始
+            }
+            });
         layer.close(index);
       });
     } else if(obj.event === 'edit'){
@@ -147,7 +179,7 @@ layui.define(['table', 'form'], function(exports){
       layer.open({
         type: 2
         ,title: '编辑分类'
-        ,content: '../../../views/app/content/tagsform.html?id='+ data.id
+        ,content: 'tagsform_modify?id='+ data.id
         ,area: ['450px', '200px']
         ,btn: ['确定', '取消']
         ,yes: function(index, layero){
@@ -194,25 +226,71 @@ layui.define(['table', 'form'], function(exports){
     var data = obj.data;
     if(obj.event === 'del'){
       layer.confirm('确定删除此条评论？', function(index){
-        obj.del();
+        $.ajax({ 
+        url: "comment_delete"//layui.setter.base + 'json/user/reg.js' //实际使用请改成服务端真实接口
+        ,type:"post"
+        ,data: data
+        ,done: function(res){
+          layer.msg('删除成功', {
+            icon: 6
+            ,time: 1000
+          });
+        },
+        error: function(res){
+          layer.msg('删除失败', {
+            icon: 6
+            ,time: 1000
+          });
+        }
+        });
+        table.reload('LAY-app-content-comm', {
+            page: {
+            curr: 1 //重新从第 1 页开始
+            }
+            });
         layer.close(index);
       });
     } else if(obj.event === 'edit') {
       layer.open({
         type: 2
         ,title: '编辑评论'
-        ,content: '../../../views/app/content/contform.html'
+        ,content: 'contform?id='+ data.id
         ,area: ['450px', '300px']
         ,btn: ['确定', '取消']
         ,yes: function(index, layero){
           var iframeWindow = window['layui-layer-iframe'+ index]
           ,submitID = 'layuiadmin-app-comm-submit'
           ,submit = layero.find('iframe').contents().find('#'+ submitID);
-
+          var b = {
+          id:data.id
+          }
           //监听提交
           iframeWindow.layui.form.on('submit('+ submitID +')', function(data){
             var field = data.field; //获取提交的字段
-            
+            function combin(a,b){
+              for(var i in b){
+                a[i] = b[i]
+              }
+              return a;
+            }
+            var new_field = combin(field,b)
+            $.ajax({ 
+            url: "conmment_modify"//layui.setter.base + 'json/user/reg.js' //实际使用请改成服务端真实接口
+            ,type:"get"
+            ,data: new_field
+            ,done: function(res){        
+              layer.msg('修改成功', {
+                icon: 6
+                ,time: 1000
+              });
+            },
+            error: function(res){
+              layer.msg('修改失败', {
+                icon: 6
+                ,time: 1000
+              });
+            }
+            }); 
             //提交 Ajax 成功后，静态更新表格中的数据
             //$.ajax({});
             table.reload('LAY-app-content-comm'); //数据刷新

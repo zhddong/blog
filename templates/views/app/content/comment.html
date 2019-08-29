@@ -4,7 +4,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>layuiAdmin 内容系统 - 评论管理</title>
+  <title>内容系统 - 评论管理</title>
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
@@ -88,7 +88,23 @@
         }
       
         layer.confirm('确定删除吗？', function(index) {
-          
+          $.ajax({ 
+          url: "comment_delete"
+          ,type:"post"
+          ,data: data
+          ,success: function(res){
+            layer.msg('删除成功', {
+              icon: 6
+              ,time: 1000
+            });
+          },
+          error: function(res){
+            layer.msg('删除失败', {
+              icon: 6
+              ,time: 1000
+            });
+          }
+          });
           //执行 Ajax 后重载
           /*
           admin.req({

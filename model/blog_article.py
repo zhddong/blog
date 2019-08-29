@@ -11,6 +11,7 @@ class Article(object):
         port=3306,
         charset="utf8")
         self.cursor = self.conn.cursor()
+    #指定用户文章内容查询
     def query(self,id):
         sql = "SELECT `id`, `user_id`, `class_id`, `label_id`, `title`, `content`, `read`, `create_time` FROM `article` WHERE `status`=1 and id=%d" %id
         try:
@@ -21,6 +22,7 @@ class Article(object):
             
         except Exception as e:
             print(sql,e)
+    #文章添加
     def increase(self,user_id,title,class_id,content,label_id,status):
             sql = "INSERT INTO `article`( `user_id`, `title`, `class_id`,`content`, `label_id`, `status`) VALUES {}"
             op_sql = sql.format((user_id,title,class_id,content,label_id,status))
@@ -31,25 +33,28 @@ class Article(object):
         
             except Exception as e:
                 print(op_sql,e)
+    #文章修改
     def modify(self,user_id,title,class_id,content,label_id,status,article_id):
-            sql = """UPDATE `article` SET `user_id`=%d,`title`="%s",`class_id`=%d,
-            `content`="%s",`label_id`=%d,`status`=%d
-            WHERE `id`=%s"""%(user_id,title,class_id,content,label_id,status,article_id)
+            sql = """UPDATE `article` SET `user_id`=%s,`title`=%s,`class_id`=%s,
+            `content`=%s,`label_id`=%s,`status`=%s
+            WHERE `id`=%s"""
             # op_sql = sql.format((user_id,title,class_id,content,label_id,status,id))
             # print(sql)
             # print(user_id,title,class_id,content,label_id,status,article_id)#检测收到的数据
 
             try:
-                self.cursor.execute(sql)
+                self.cursor.execute(sql,(user_id,title,class_id,content,label_id,status,article_id))
         
             except Exception as e:
                 print(sql,e)
+    #文章删除
     def delete(self,delete_id):
             sql = "UPDATE `article` SET `status`=2 WHERE  id=%s"%delete_id
             try:
                 self.cursor.execute(sql)
             except Exception as e:
                 print(sql,e)
+    #后台管理文章查询
     def data_all_display(self):
         # %(id,"%",author,"%","%",title,"%",label)
         sql = """SELECT a.id,user.name,a.title,a.label_id, 
@@ -63,6 +68,7 @@ class Article(object):
             
         except Exception as e:
             print(sql,e)
+    #主页文章查询
     def xianyan_display(self):
         # %(id,"%",author,"%","%",title,"%",label)
         sql = """SELECT a.title,
@@ -76,6 +82,7 @@ class Article(object):
             
         except Exception as e:
             print(sql,e)
+
     def ct_details(self,id):
         sql = """SELECT a.title,
         a.content,a.create_time,user.id ,a.id,a.read ,a.like
@@ -88,6 +95,7 @@ class Article(object):
                 
         except Exception as e:
             print(sql,e)
+    #修改点赞量
     def fabulous(self,ct_id):
         sql = "UPDATE `article` SET `like`=`like`+1 WHERE  id=%s"
         try:
@@ -98,6 +106,7 @@ class Article(object):
                 
         except Exception as e:
             print(sql,e)
+    #修改阅读量
     def browse(self,ct_id):
         sql = "UPDATE `article` SET `read`=`read`+1 WHERE  id=%s"
         try:
