@@ -6,8 +6,9 @@ import os, sys
 sys.path.append("..")
 import markdown
 from model.blog_article import Article
-
-model_article = Article()
+import config
+cfg = config.load_config("config/config.json")
+model_article = Article(cfg)
 
 head = """<!DOCTYPE html>
 <html>

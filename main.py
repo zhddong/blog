@@ -18,13 +18,16 @@ import json,os
 import utils
 import types
 import cgi
+import markdown
 from flask import render_template
+import config
+cfg = config.load_config("config/config.json")
 # app = Flask(__name__,template_folder="./templates",static_folder="./static")#flask框架的用法
 app = Flask(__name__,template_folder="./templates",static_folder="./layuiadmin")#flask框架的用法
 app.config['SECRET_KEY']="happy22"#os.urandom(24)   #设置为24位的字符,每次运行服务器都是不同的，所以服务器启动一次上次的session就清除。
 app.config['PERMANENT_SESSION_LIFETIME']=timedelta(days=180) #设置session的保存时间。
 
-all_user = User()
+all_user = User(cfg)
 
 # @app.route('/blog')
 # def hello_world():
@@ -71,6 +74,7 @@ def status_num(status):
         return 0
 #加载主界面
 @app.route('/most_index', methods=['POST','GET'])
+@utils.auth_wrapper(all_user.app_index,"auth")
 def most_index():
     if request.method == "POST":
         pass
@@ -83,7 +87,7 @@ def most_index():
 def app_index():
     if request.method == "POST":
         session.get('username')
-        blog_user = User()
+        blog_user = User(cfg)
         data = blog_user.app_index(name)
         state = {"state": 0}
         states = {"state": 1}
@@ -146,7 +150,7 @@ def conmment_modify():
             com_id = 0
         else:
             com_id = int (com_id)
-        blog_comment = Comment()
+        blog_comment = Comment(cfg)
         blog_comment.comment_modify(com_content,com_id)
         blog_comment.commit()
         res = {"code": 0,
@@ -164,7 +168,7 @@ def conmment_modify():
             com_id = 0
         else:
             com_id = int (com_id)
-        blog_comment = Comment()
+        blog_comment = Comment(cfg)
         blog_comment.comment_modify(com_content,com_id)
         blog_comment.commit()
         res = {"code": 0,
@@ -179,7 +183,7 @@ def conmment_modify():
 @utils.auth_wrapper(all_user.app_index,"auth")
 def comment_delete():
     delete_id = request.form.get("id")
-    blog_comment = Comment()
+    blog_comment = Comment(cfg)
     blog_comment.comment_delete(delete_id)  
     blog_comment.commit()
     res = {"code": 0,
@@ -199,7 +203,7 @@ def comments_all_query():
         com_content = request.form.get("content")
         commtime = request.form.get("commtime")
         page = request.form.get("page")
-        blog_comment = Comment()
+        blog_comment = Comment(cfg)
         data = blog_comment.comment_management()
         if not data:
             res = {"code": -1,
@@ -253,7 +257,7 @@ def comments_all_query():
         com_content = request.args.get("content")
         commtime = request.args.get("commtime")
         page = request.args.get("page")
-        blog_comment = Comment()
+        blog_comment = Comment(cfg)
         data = blog_comment.comment_management()
         if not data:
             res = {"code": -1,
@@ -323,7 +327,7 @@ def contform():
 def tagsform_add():
     if request.method == "POST":
         name = request.form.get("tags")
-        blog_class = Class()
+        blog_class = Class(cfg)
         blog_class.insert(name)
         blog_class.commit()
         res = {"code": 0,
@@ -343,7 +347,7 @@ def tagsform_modify():
     if request.method == "POST":
         name = request.form.get("tags")
         modify_id = request.form.get("id")
-        blog_class = Class()
+        blog_class = Class(cfg)
         blog_class.modify(name,modify_id)
         blog_class.commit()
         res = {"code": 0,
@@ -366,7 +370,7 @@ def classification():
     else:
         req_id = request.args.get("id")
         name = request.args.get("tags")
-    blog_class = Class()
+    blog_class = Class(cfg)
     data = blog_class.query()
     list_data = list(data)
     data_new = []
@@ -398,7 +402,7 @@ def classification():
 def tagsform_delete():
     delete_id = request.form.get("id")
     # print(delete_id)
-    blog_class = Class()
+    blog_class = Class(cfg)
     blog_class.delete(delete_id)  
     blog_class.commit()
     res = {"code": 0,
@@ -416,7 +420,7 @@ def tagsform_delete():
 #         name = request.form.get("tags")
 #     else:
 #         name = request.args.get("tags")
-#     blog_class = Class()
+#     blog_class = Class(cfg)
 #     # print(name)
 #     blog_class.insert(name)
 #     res = {"code": 0,
@@ -441,7 +445,7 @@ def user_login():
         name = request.form.get("username")
         password = request.form.get("password")
         vercode = request.form.get("vercode")
-        blog_user = User()
+        blog_user = User(cfg)
         hash = hashlib.sha1()
         hash.update(password.encode('utf-8'))
         pass_wd = hash.hexdigest()
@@ -468,6 +472,9 @@ def user_login():
             response = make_response(res)
             return response
     else:
+        name = session.get('username')
+        if name:
+            return redirect(url_for("fabulous_query"))
         return render_template('views/user/login.html',
             )
 #显示文章内容以及评论内容
@@ -476,7 +483,7 @@ def details():
     if request.method == "POST":
         ct_id = request.form.get("id")
         page = request.form.get("page")
-        blog_comment = Comment()
+        blog_comment = Comment(cfg)
         comment = blog_comment.comments_query(ct_id)
         # print(ct_id)
         if not comment:
@@ -519,9 +526,9 @@ def details():
         return response
     else:
         ct_id = request.args.get("id")
-        blog_article = Article()
+        blog_article = Article(cfg)
         data = blog_article.ct_details(ct_id)
-        # blog_comment = Comment()
+        # blog_comment = Comment(cfg)
         # comment = blog_comment.comments_query(ct_id)
         # print(comment)
         if not data:
@@ -545,9 +552,9 @@ def details():
 def details_article():
     if request.method == "POST":
         ct_id = request.form.get("id")
-        blog_article = Article()
+        blog_article = Article(cfg)
         data = blog_article.ct_details(ct_id)
-        blog_content_info = Content_info()
+        blog_content_info = Content_info(cfg)
         data = list(data)
         data_new = []
         for i in data:
@@ -563,6 +570,8 @@ def details_article():
             else:
                 is_like = 1
             create_time = str(create_time)
+            exts = ['markdown.extensions.extra', 'markdown.extensions.codehilite','markdown.extensions.tables','markdown.extensions.toc'] 
+            content = markdown.markdown(content,extensions=exts)
             articlecontent = {"create_time": create_time,
             "title":title,"content":content,"read":read,
             "id":content_id ,"is_like":is_like,"like":like
@@ -590,7 +599,8 @@ def message():
     if request.method == "POST":
         # content = request.form.get("content")
         page = request.form.get("page")
-        blog_message = Message()
+        print(page)
+        blog_message = Message(cfg)
         # ip = request.remote_addr
         # print(ip,content)
         # blog_message.message_add(ip,content)
@@ -621,7 +631,7 @@ def message():
         page = int(page)
         page = page-1
         page_final = page*3
-        data_final = data_new[b:b+3]
+        data_final = data_new[page_final:page_final+3]
         # print(c)
         if not data_final:
             res = {"code": -1,
@@ -646,7 +656,7 @@ def message():
 def message_add():
     if request.method == "POST":
         content = request.form.get("content")
-        blog_message = Message()
+        blog_message = Message(cfg)
         ip = request.remote_addr
         # print(ip,content)
         blog_message.message_add(ip,content)
@@ -666,7 +676,7 @@ def about():
     if request.method == "POST":
         pass
     else:
-        blog_about = About()
+        blog_about = About(cfg)
         data = blog_about.about_query()
         return render_template('html/about.html',
             about_title = data[0][0],
@@ -681,7 +691,7 @@ def about():
 #         ct_id = request.args.get("id")
 #         blog_article = Article()
 #         data = blog_article.ct_details(ct_id)
-#         # blog_comment = Comment()
+#         # blog_comment = Comment(cfg)
 #         # comment = blog_comment.comments_query(ct_id)
 #         # print(data)
 #         return render_template('html/comment.html',
@@ -702,7 +712,7 @@ def comment_add():
         # print(ct_id)
         ip = request.remote_addr
         # print(ip)
-        blog_comment = Comment()
+        blog_comment = Comment(cfg)
         # hash = hashlib.sha1()
         # hash.update(ip.encode('utf-8'))
         # comment_ip = hash.hexdigest()
@@ -717,16 +727,16 @@ def comment_add():
         response.headers["Access-Control-Allow-Origin"] = "*"
         return response
     else:
-        # ct_id = request.args.get("id")
-        # blog_comment = Comment()
-        # comment = blog_article.comments_query(ct_id)
+        ct_id = request.args.get("id")
+        # blog_comment = Comment(cfg)
+        # comment = blog_comment.comments_query(ct_id)
         return render_template('html/comment.html',
-            comment_like=566,
-            comment_time="一天前",
-            comment_content="很好",
-            comment_see=545,
-            comment_title="公司客户",
-            ct_id=99
+            # comment_like=566,
+            # comment_time="一天前",
+            # comment_content="很好",
+            # comment_see=545,
+            # comment_title="公司客户",
+            ct_id=ct_id
             )
 
 @app.route('/', methods=['POST','GET'])
@@ -741,10 +751,10 @@ def fabulous():
         # print(ip)
         # print(ct_id)
         # ct_like = request.args.get("like")
-        blog_content_info = Content_info()
+        blog_content_info = Content_info(cfg)
         hash = hashlib.sha1()
-        a = str(ct_id+ip)
-        hash.update(a.encode('utf-8'))
+        encryption = str(ct_id+ip)
+        hash.update(encryption.encode('utf-8'))
         combination = hash.hexdigest()
         data = blog_content_info.ip_address(ct_id,ip,combination)
         # print(data)
@@ -769,7 +779,7 @@ def fabulous_query():
         # print(ip)
         # print(ct_id)
         # ct_like = request.args.get("like")
-        blog_content_info = Content_info()
+        blog_content_info = Content_info(cfg)
         data = blog_content_info.fabulous_query(ct_id)
         # print(data)
         state = {"state": data}
@@ -788,7 +798,7 @@ def fabulous_query():
 #浏览
 @app.route('/browse', methods=['GET'])
 def browse():
-    blog_article = Article()
+    blog_article = Article(cfg)
     data = blog_article.browse(ct_id)
 # 闲言文章显示
 @app.route('/xianyan_dispaly', methods=['POST', 'GET'])
@@ -803,10 +813,10 @@ def xianyan_dispaly():
         title = request.args.get("title")
         content = request.args.get("content")
         page = request.args.get("page")
-    blog_article = Article()
+    blog_article = Article(cfg)
     data = blog_article.xianyan_display()
     # print(data)
-    blog_content_info = Content_info()
+    blog_content_info = Content_info(cfg)
     list_data = list(data)
     data_new = []
     for i in list_data:
@@ -858,7 +868,7 @@ def content_list():
         req_title = request.form.get("title")
         req_label = request.form.get("label")
         page = request.form.get("page")
-        blog_article = Article()
+        blog_article = Article(cfg)
         data = blog_article.data_all_display()
         # print(data)
         if not data:
@@ -936,7 +946,7 @@ def content_list():
         req_title = request.args.get("title")
         req_label = request.args.get("label")
         page = request.args.get("page")
-        blog_article = Article()
+        blog_article = Article(cfg)
         data = blog_article.data_all_display()
         if not data:
             res = {"code": -1,
@@ -996,7 +1006,7 @@ def content_list():
 def delete_articles():
     delete_id = request.form.get("id")
     # print(delete_id)
-    blog_article = Article()
+    blog_article = Article(cfg)
     blog_article.delete(delete_id)  
     blog_article.commit()
     res = {"code": 0,
@@ -1023,7 +1033,7 @@ def content_modify():
             user_id = 0
         else:
             user_id = int (user_id)
-        blog_article = Article()
+        blog_article = Article(cfg)
         label_id = transformation(label)
         class_id = transformation1(classification)
         blog_article.modify(user_id,title,class_id,content,label_id,status,article_id)
@@ -1048,7 +1058,7 @@ def content_modify():
             user_id = 0
         else:
             user_id = int (user_id)
-        blog_article = Article()
+        blog_article = Article(cfg)
         label_id = transformation(label)
         class_id = transformation1(classification)
         blog_article.modify(user_id,title,class_id,content,label_id,status,article_id)
@@ -1076,7 +1086,7 @@ def content():
         status = status_num(status)
         user_id = int (user_id)
         content = cgi.escape(content)
-        blog_article = Article()
+        blog_article = Article(cfg)
         label_id = transformation(label)
         class_id = transformation1(classification)
         blog_article.increase(user_id,title,class_id,content,label_id,status)
@@ -1098,7 +1108,7 @@ def content():
         status = status_num(status)
         user_id = int (user_id)
         content = cgi.escape(content)
-        blog_article = Article()
+        blog_article = Article(cfg)
         label_id = transformation(label)
         class_id = transformation1(classification)
         blog_article.increase(user_id,title,class_id,content,label_id,status)
@@ -1134,7 +1144,7 @@ def reg():
         hash = hashlib.sha1()
         hash.update(password.encode('utf-8'))
         pass_wd = hash.hexdigest() 
-        blog_user = User()
+        blog_user = User(cfg)
         blog_user.insert(pass_wd,nickname,phone)
         blog_user.commit()
         return make_resdata(0, "success")

@@ -2,13 +2,13 @@
 import pymysql
 class Message(object):
     """docstring for Article"""
-    def __init__(self):
+    def __init__(self,cfg):
         self.conn = pymysql.connect(
-        host="127.0.0.1",
-        user="zhd",
-        password="123456",
-        database="blog",
-        port=3306,
+        host=cfg["mysql"]["model"]["host"],
+        user=cfg["mysql"]["model"]["user"],
+        password=cfg["mysql"]["model"]["password"],
+        database=cfg["mysql"]["model"]["database"],
+        port=cfg["mysql"]["model"]["port"],
         charset="utf8")
         self.cursor = self.conn.cursor()
     def message_add(self,ip,content):
