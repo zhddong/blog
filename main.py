@@ -599,7 +599,7 @@ def message():
     if request.method == "POST":
         # content = request.form.get("content")
         page = request.form.get("page")
-        print(page)
+        # print(page)
         blog_message = Message(cfg)
         # ip = request.remote_addr
         # print(ip,content)
@@ -674,13 +674,28 @@ def message_add():
 @app.route('/about', methods=['POST','GET'])
 def about():
     if request.method == "POST":
-        pass
-    else:
         blog_about = About(cfg)
         data = blog_about.about_query()
+        if not data:
+            return "还没有内容！！！"
+        content = data[0][1]
+        exts = ['markdown.extensions.extra', 'markdown.extensions.codehilite','markdown.extensions.tables','markdown.extensions.toc'] 
+        content = markdown.markdown(content,extensions=exts) 
+        data = {"title":data[0][0],"content":content}
+        res = {
+            "code": 0,
+            "msg": "",
+            "data": data 
+        }
+        res = json.dumps(res)
+        response = make_response(res)
+        return response
+    else:
+        # blog_about = About(cfg)
+        # data = blog_about.about_query()
+        # if not data:
+        #     return "还没有内容！！！"
         return render_template('html/about.html',
-            about_title = data[0][0],
-            about_content = data[0][1]
             )
 #评论显示
 # @app.route('/comments_query', methods=['POST','GET'])
@@ -1161,4 +1176,4 @@ def reg():
 def auth():
     return "你没有权限！！！"
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080, debug=True)
+    app.run(host='0.0.0.0', port=cfg["server"]["listen"], debug=cfg["server"]["debug"])

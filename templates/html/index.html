@@ -71,22 +71,6 @@
 		</div>
 	<script src="../layuiadmin/res/layui/layui.js"></script>
 	<script src="../layuiadmin/res/static/js/jquery-1.9.0.min.js"></script>
-<!-- 	<script>
-		function comment(){
-			console.log(data.data.state)
-			if(data.data.state!=1){
-            layer.msg('没有权限', {
-                  icon: 6
-                  ,time: 1000
-              })
-              }
-          	else {
-            function(){
-            location.href = '../app_list'; //后台主页
-              }
-			}
-		}
-	</script> -->
 	<script>
 		layui.config({
 		  base: '../layuiadmin/res/static/js/' 
@@ -111,50 +95,6 @@
 		　　　　　　 }
 		})();
 		button_onclick()
-		// fabulous_query()
-	// 	function fabulous(item_id){
-	// 	// $(function () {
-	//  //    	$(".like").on('click',function () {
-	//  //      		// console.log("asdf")
-
-	//       $.ajax({ 
-	//         url: "http://127.0.0.1:8080/fabulous"//layui.setter.base + 'json/user/reg.js' //实际使用请改成服务端真实接口
-	//         ,type:"get"
-	//         ,data: {id:item_id}
-	//         ,
-	//         });
-	//     	if(!($(this).hasClass("layblog-this"))){
-	//         this.text = '已赞';
-	//         $(this).addClass('layblog-this');
-	//         $.tipsBox({
-	//           obj: $(this),
-	//           str: "+1",
-	//           callback: function () {
-	//           }
-	//         });
-	//         niceIn($(this));
-	//         layer.msg('点赞成功', {
-	//           icon: 6
-	//           ,time: 1000
- //        	})
- //      		} 
-	// }
-	   //  	});
-  		// });
-  // 		function fabulous_query(item_id){
-		// $.ajax({ 
-  //       url: "fabulous_query"//layui.setter.base + 'json/user/reg.js' //实际使用请改成服务端真实接口
-  //       ,type:"POST"
-  //       ,data: {id:item_id}
-  //       ,dataType:"json",
-  //       success: function (data) {
-  //       	console.log(item_id)
-  //       	if(data.data.state!=1){
-  //       		document.getElementById("color"+item_id).style="color:#FF0000";
-  // 			}
-  // 		}
-  // 		})
-		// }
   		function fabulous(item_id){
 		// console.log("dadafw")
 		$.ajax({ 
